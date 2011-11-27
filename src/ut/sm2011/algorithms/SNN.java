@@ -8,7 +8,7 @@ import java.util.Vector;
 /**
  * Shared Nearest Neighbor (SNN) implementation.
  */
-public class SNN {
+public class SNN implements ClusteringAlgorithm {
 
 	private int K;
 
@@ -43,6 +43,10 @@ public class SNN {
 		this.linkThreshold = linkThreshold;
 	}
 
+	/* (non-Javadoc)
+	 * @see ut.sm2011.algorithms.ClusteringAlgorithm#run()
+	 */
+	@Override
 	public int run() {
 		if (points == null || points.size() == 0) {
 			System.out.println("Nothing to cluster.");

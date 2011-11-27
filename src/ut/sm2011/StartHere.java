@@ -40,7 +40,7 @@ public class StartHere {
 			points.add(new DataPoint(rand.nextInt(100), rand.nextInt(100)));
 		}
 		
-		SNN algorithm = new SNN(points, 20, 20, 0, 15);
+		ClusteringAlgorithm algorithm = new SNN(points, 20, 20, 0, 15);
 		algorithm.run();
 		
 		outPoints(points);
