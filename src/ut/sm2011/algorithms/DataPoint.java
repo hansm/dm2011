@@ -1,4 +1,4 @@
-package ut.sm2011.algorithm;
+package ut.sm2011.algorithms;
 
 public class DataPoint {
 

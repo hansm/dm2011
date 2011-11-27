@@ -3,7 +3,7 @@ package ut.sm2011;
 import java.util.Random;
 import java.util.Vector;
 
-import ut.sm2011.algorithm.*;
+import ut.sm2011.algorithms.*;
 
 public class StartHere {
 
