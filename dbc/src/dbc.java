@@ -1,6 +1,5 @@
 import java.awt.*;
 
-
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -12,19 +11,25 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.border.BevelBorder;
 
 public class dbc extends Canvas
 {
-	public static int loendur = 0;
-	public static int maxpunkte = 10;
 	private static JTextField kontroll;
 	
-	public static ArrayList<P> points = new ArrayList<P>();
-	public static Color[] colors = new Color[24];
 	private static JTextField txtFilename;
+	private static JLabel lblElements;
+	private static JLabel lblClusters;
+	
+	public static ArrayList<P> points = new ArrayList<P>();
+	
+//	private static int clusters = 0;
+	public static Color[] colors = new Color[24];
+	
 	
 	public static int dotSize = 8;
 	
@@ -45,37 +50,23 @@ public class dbc extends Canvas
 //    		g.fillOval(20, 10+15*i, 15, 15);
 //    		g.drawString(" - " + i, 40, 20+15*i);
 //    		
-//    	}
-    	
+//    	}	
     }
     
     public static void addPoint(Point p) 
     {
     	points.add(new P(p)); 
-    	kontroll.setText((p.x / 50) + " " + (4 * p.y / 125) + " = " + (int)(Math.floor(p.x / 125) + 4 * Math.floor(p.y / 125)));
+    	lblElements.setText(Integer.toString(points.size()));
+//    	kontroll.setText((p.x / 50) + " " + (4 * p.y / 125) + " = " + (int)(Math.floor(p.x / 125) + 4 * Math.floor(p.y / 125)));
     }
     
     public static void klassifitseeri() {
     	for (P point : points) {
-    		
     		point.cluster = (int)(Math.floor(point.coordX / 125) + 4 * Math.floor(point.coordY / 125));
-//    		int r = (int)((double)255 / 500 * point.coordX);
-//    		int g = (int)((double)255 / 500 * point.coordY);
-//    		point.cluster = 100*r + g;
     	}
     }
    
     public static void createColors() {
-//    	int l = 0;
-//    	float step = (360f / colors.length);
-//    	for(int i = 0; i < 360; i += step) {
-//    	    float hue = i;
-//    	    float saturation = 0.9f + (float)(Math.random() / 10);
-//    	    float lightness = 0.5f + (float)(Math.random() / 2);
-//    	    colors[l] = Color.getHSBColor(hue, saturation, lightness);
-//    	    l++;
-//    	}
-
     	int[] c = {255, 192, 160, 128};
     	for (int i = 0; i < c.length; i++) {
     		colors[(0 + 6*i)] = new Color(0, 0, c[i]);
@@ -85,22 +76,27 @@ public class dbc extends Canvas
     		colors[(4 + 6*i)] = new Color(c[i], 0, c[i]);
     		colors[(5 + 6*i)] = new Color(c[i], c[i], 0);
     	}
-//    	float step = (360f / colors.length);
-//    	System.out.println(step);
-//    	for (int i = 0; i < colors.length; i++) {
-//    		colors[i] = Color.getHSBColor((float)i * step / 360, 1f, 0.8f);
-////    		colors[i] = Color.getHSBColor((float)i * step / 360, 0.9f + (float)(Math.random() / 10), 0.5f + (float)(Math.random() / 2));
-//    		System.out.println(i + " (" + ((float)i * step / 360) + ") - " + colors[i]);
-//    	}
-//    	int l = 0;
-//    	for(int r = 0; r < 255; r = r + 64) {
-//    		   for(int g = 0; g < 255; g = g + 64) {
-//    		      for(int b = 0; b < 255; b = b + 64) {
-//    		    	  colors[l] = new Color(r,g,b);
-//    		    	  l++;
-//    		      }
-//    		   }
-//    	}
+    }
+    
+    public static void countClusters() {
+    	HashSet hs = new HashSet();
+		for (P p : points) {
+			hs.add(p.cluster);
+		}
+		lblClusters.setText(Integer.toString(hs.size()));
+    }
+    
+    // Clustering algorithms
+    public static void clustering1() {
+    	kontroll.setText("Clustering 1 algorithm: running");
+    }
+    
+    public static void clustering2() {
+    	kontroll.setText("Clustering 2 algorithm: running");
+    }
+    
+    public static void clustering3() {
+    	kontroll.setText("Clustering 3 algorithm: running");
     }
     
     /**
@@ -109,19 +105,16 @@ public class dbc extends Canvas
     public static void main(String[] args)
     {
     	createColors();
-    	
         final dbc canvas = new dbc();
         canvas.setBackground(Color.WHITE);
         canvas.addMouseListener(new MouseAdapter() {
         	public void mouseClicked(MouseEvent e) {
-        		if (loendur < maxpunkte) {
-        			addPoint(e.getPoint());
-        			canvas.repaint();
-        		}
+    			addPoint(e.getPoint());
+    			canvas.repaint();
         	}
         	
         });
-        canvas.setBounds(273, 28, 500, 500);
+        canvas.setBounds(273, 50, 500, 500);
         JFrame frmDensitybasedClustering = new JFrame();
         frmDensitybasedClustering.setTitle("Density-based clustering");
         frmDensitybasedClustering.setResizable(false);
@@ -130,40 +123,124 @@ public class dbc extends Canvas
         frmDensitybasedClustering.getContentPane().setLayout(null);
         frmDensitybasedClustering.getContentPane().add(canvas);
         
-        JButton btnKlassifitseeri = new JButton("Klassifitseeri");
-        btnKlassifitseeri.addMouseListener(new MouseAdapter() {
-        	@Override
-        	public void mouseClicked(MouseEvent arg0) {
-        		klassifitseeri();
-        		canvas.repaint();
-        	}
-        });
-        
-        btnKlassifitseeri.setBounds(22, 75, 227, 23);
-        frmDensitybasedClustering.getContentPane().add(btnKlassifitseeri);
-        
         kontroll = new JTextField();
-        kontroll.setBounds(10, 430, 246, 20);
+        kontroll.setBounds(5, 555, 246, 20);
         frmDensitybasedClustering.getContentPane().add(kontroll);
         kontroll.setColumns(10);
         
-        final JLabel lblSlidervalue = new JLabel(Integer.toString(maxpunkte));
-        lblSlidervalue.setBounds(232, 28, 46, 14);
-        frmDensitybasedClustering.getContentPane().add(lblSlidervalue);
-        
-        final JSlider sliderPunktideArv = new JSlider();
-        sliderPunktideArv.addChangeListener(new ChangeListener() {
-        	public void stateChanged(ChangeEvent arg0) {
-        		maxpunkte = sliderPunktideArv.getValue();
-        		lblSlidervalue.setText(Integer.toString(maxpunkte));
+        JButton btnClear = new JButton("Clear");
+        btnClear.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		points.clear();
+        		lblElements.setText("0");
+        		lblClusters.setText("0");
+        		canvas.repaint();
         	}
-        	
         });
-        sliderPunktideArv.setValue(maxpunkte);
-        sliderPunktideArv.setBounds(22, 28, 200, 23);
-        frmDensitybasedClustering.getContentPane().add(sliderPunktideArv);
+        btnClear.setBounds(24, 527, 227, 23);
+        frmDensitybasedClustering.getContentPane().add(btnClear);
         
-        JButton btnOpenFile = new JButton("Open File");
+        JPanel panelStat = new JPanel();
+        panelStat.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+        panelStat.setBounds(24, 408, 227, 108);
+        frmDensitybasedClustering.getContentPane().add(panelStat);
+        panelStat.setLayout(null);
+        
+        JLabel lblElementsLabel = new JLabel("Elements: ");
+        lblElementsLabel.setBounds(10, 11, 62, 14);
+        panelStat.add(lblElementsLabel);
+        
+        lblElements = new JLabel("0");
+        lblElements.setBounds(82, 11, 46, 14);
+        panelStat.add(lblElements);
+        
+        JLabel lblClustersLabel = new JLabel("Clusters:");
+        lblClustersLabel.setBounds(10, 28, 62, 14);
+        panelStat.add(lblClustersLabel);
+        
+        lblClusters = new JLabel("");
+        lblClusters.setBounds(82, 28, 46, 14);
+        panelStat.add(lblClusters);
+        
+        JPanel panelCanvas = new JPanel();
+        panelCanvas.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
+        panelCanvas.setBounds(268, 45, 510, 510);
+        frmDensitybasedClustering.getContentPane().add(panelCanvas);
+        panelCanvas.setLayout(null);
+        
+        JPanel panelInput = new JPanel();
+        panelInput.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
+        panelInput.setBounds(24, 161, 227, 75);
+        frmDensitybasedClustering.getContentPane().add(panelInput);
+        panelInput.setLayout(null);
+        
+        txtFilename = new JTextField();
+        txtFilename.setBounds(10, 11, 207, 20);
+        panelInput.add(txtFilename);
+        txtFilename.setText("input.csv");
+        txtFilename.setColumns(10);
+        
+        JButton btnOpenFile = new JButton("Read Data From File");
+        btnOpenFile.setBounds(10, 43, 207, 23);
+        panelInput.add(btnOpenFile);
+        
+        JPanel panelCluster = new JPanel();
+        panelCluster.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
+        panelCluster.setBounds(24, 247, 227, 150);
+        frmDensitybasedClustering.getContentPane().add(panelCluster);
+        panelCluster.setLayout(null);
+        
+        JButton btnTestClustering = new JButton("ClusterTest");
+        btnTestClustering.setBounds(10, 11, 207, 23);
+        panelCluster.add(btnTestClustering);
+        
+        JButton btnClustering1 = new JButton("Clustering 1");
+        btnClustering1.setBounds(10, 45, 207, 23);
+        panelCluster.add(btnClustering1);
+        
+        JButton btnClustering2 = new JButton("Clustering 2");
+        btnClustering2.setBounds(12, 79, 205, 23);
+        panelCluster.add(btnClustering2);
+        
+        JButton btnClustering3 = new JButton("Clustering 3");
+        btnClustering3.setBounds(12, 113, 205, 23);
+        panelCluster.add(btnClustering3);
+        
+        JLabel lblAuthors = new JLabel("Authors: Martin Loginov, Hans M\u00E4esalu, Sven Aller");
+        lblAuthors.setHorizontalAlignment(SwingConstants.RIGHT);
+        lblAuthors.setBounds(415, 555, 363, 14);
+        frmDensitybasedClustering.getContentPane().add(lblAuthors);
+        btnClustering3.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent arg0) {
+        		clustering3();
+        		canvas.repaint();
+        	}
+        });
+        btnClustering2.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent arg0) {
+        		clustering2();
+        		canvas.repaint();
+        	}
+        });
+        btnClustering1.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent arg0) {
+        		clustering1();
+        		
+        		canvas.repaint();
+        	}
+        });
+        btnTestClustering.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent arg0) {
+        		klassifitseeri();
+        		countClusters();
+        		canvas.repaint();
+        	}
+        });
         btnOpenFile.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
@@ -183,46 +260,22 @@ public class dbc extends Canvas
         		        pointsfromfile.add(newPoint);
         		    }
         		    in.close();
-        		    double changeX = 490d / maxX;
-        		    double changeY = 490d / maxY;
-//        		    System.out.println(changeX + " " + changeY);
+        		    double changeX = 499d / maxX;
+        		    double changeY = 499d / maxY;
         		    for (Point p : pointsfromfile) {
         		    	p.x = (int)(p.x * changeX);
         		    	p.y = (int)(p.y * changeY);
         		    	points.add(new P(p));
         		    }
+        		    lblElements.setText(Integer.toString(points.size()));
         		    canvas.repaint();
-
 				} 
 				catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
         	}
         });
-        btnOpenFile.setBounds(160, 390, 89, 23);
-        frmDensitybasedClustering.getContentPane().add(btnOpenFile);
-        
-        txtFilename = new JTextField();
-        txtFilename.setText("input.csv");
-        txtFilename.setBounds(22, 359, 227, 20);
-        frmDensitybasedClustering.getContentPane().add(txtFilename);
-        txtFilename.setColumns(10);
-        
-        JButton btnClear = new JButton("Clear");
-        btnClear.addMouseListener(new MouseAdapter() {
-        	@Override
-        	public void mouseClicked(MouseEvent e) {
-        		points.clear();
-        		canvas.repaint();
-        	}
-        });
-        btnClear.setBounds(22, 109, 227, 23);
-        frmDensitybasedClustering.getContentPane().add(btnClear);
-        
-        
+          
         frmDensitybasedClustering.setVisible(true);
-        
-        maxpunkte = sliderPunktideArv.getValue();
     }
 }
