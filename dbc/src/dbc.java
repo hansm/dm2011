@@ -39,6 +39,8 @@ public class dbc extends Canvas
     }
     
     // Clustering algorithms
+    // Type P: x, y, cluster (default -1)
+    // ArrayList<P> points
     public static void clustering1() {
     	kontroll.setText("Clustering 1 algorithm: running");
     }
@@ -56,7 +58,7 @@ public class dbc extends Canvas
     	g.setColor(Color.gray);
     	for (P point : points) {
     		if (point.cluster > -1) g.setColor(colors[point.cluster%colors.length]);
-    		g.fillOval(point.coordX-(int)(dotSize/2), point.coordY-(int)(dotSize/2), dotSize, dotSize);
+    		g.fillOval(point.x-(int)(dotSize/2), point.y-(int)(dotSize/2), dotSize, dotSize);
     		g.setColor(Color.gray);
     	}
     	
@@ -77,7 +79,7 @@ public class dbc extends Canvas
     
     public static void klassifitseeri() {
     	for (P point : points) {
-    		point.cluster = (int)(Math.floor(point.coordX / 125) + 4 * Math.floor(point.coordY / 125));
+    		point.cluster = (int)(Math.floor(point.x / 125) + 4 * Math.floor(point.y / 125));
     	}
     }
    
