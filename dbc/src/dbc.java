@@ -16,6 +16,8 @@ import java.util.HashSet;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.border.BevelBorder;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class dbc extends Canvas
 {
@@ -26,6 +28,7 @@ public class dbc extends Canvas
 	private static JTextField txtFilename;
 	private static JLabel lblElements;
 	private static JLabel lblClusters;
+
 	
 	public static ArrayList<P> points = new ArrayList<P>();
 	
@@ -129,6 +132,10 @@ public class dbc extends Canvas
 		canvas.repaint();
     }
     
+    
+ 
+
+    
   
     /**
      * @wbp.parser.entryPoint
@@ -146,6 +153,7 @@ public class dbc extends Canvas
         });
         canvas.setBounds(273, 50, 500, 500);
         JFrame frmDensitybasedClustering = new JFrame();
+        frmDensitybasedClustering.setIconImage(Toolkit.getDefaultToolkit().getImage(dbc.class.getResource("/images/icon-logo.gif")));
         frmDensitybasedClustering.setTitle("Density-based clustering");
         frmDensitybasedClustering.setResizable(false);
         frmDensitybasedClustering.setSize(800, 600);
@@ -159,6 +167,7 @@ public class dbc extends Canvas
         kontroll.setColumns(10);
         
         JButton btnClear = new JButton("Clear");
+        btnClear.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-delete.gif")));
         btnClear.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent e) {
@@ -203,13 +212,28 @@ public class dbc extends Canvas
         panelInput.setLayout(null);
         
         txtFilename = new JTextField();
-        txtFilename.setBounds(10, 11, 207, 20);
+        txtFilename.setBounds(10, 11, 167, 20);
         panelInput.add(txtFilename);
         txtFilename.setText("input.csv");
         txtFilename.setColumns(10);
         
-        JButton btnOpenFile = new JButton("Read Data From File");
-        btnOpenFile.setBounds(10, 43, 207, 23);
+        JButton btnReadFile = new JButton("Read Data From File");
+        btnReadFile.setHorizontalAlignment(SwingConstants.LEFT);
+        btnReadFile.setIcon(null);
+        btnReadFile.setBounds(10, 40, 207, 23);
+        panelInput.add(btnReadFile);
+        
+        JButton btnOpenFile = new JButton("");
+        btnOpenFile.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		
+        	}
+        });
+        btnOpenFile.addMouseListener(new MouseAdapter() {
+        	
+        });
+        btnOpenFile.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-open.gif")));
+        btnOpenFile.setBounds(187, 10, 30, 23);
         panelInput.add(btnOpenFile);
         
         JPanel panelCluster = new JPanel();
@@ -219,18 +243,26 @@ public class dbc extends Canvas
         panelCluster.setLayout(null);
         
         JButton btnTestClustering = new JButton("ClusterTest");
+        btnTestClustering.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
+        btnTestClustering.setHorizontalAlignment(SwingConstants.LEFT);
         btnTestClustering.setBounds(10, 11, 207, 23);
         panelCluster.add(btnTestClustering);
         
         JButton btnClustering1 = new JButton("Clustering 1");
+        btnClustering1.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
+        btnClustering1.setHorizontalAlignment(SwingConstants.LEFT);
         btnClustering1.setBounds(10, 45, 207, 23);
         panelCluster.add(btnClustering1);
         
         JButton btnClustering2 = new JButton("Clustering 2");
+        btnClustering2.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
+        btnClustering2.setHorizontalAlignment(SwingConstants.LEFT);
         btnClustering2.setBounds(12, 79, 205, 23);
         panelCluster.add(btnClustering2);
         
         JButton btnClustering3 = new JButton("Clustering 3");
+        btnClustering3.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
+        btnClustering3.setHorizontalAlignment(SwingConstants.LEFT);
         btnClustering3.setBounds(12, 113, 205, 23);
         panelCluster.add(btnClustering3);
         
@@ -262,11 +294,9 @@ public class dbc extends Canvas
         		clustering(4);
         	}
         });
-        btnOpenFile.addMouseListener(new MouseAdapter() {
+        btnReadFile.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
-//        		points.clear();
-//        		canvas.repaint();
         		try {
         			BufferedReader in = new BufferedReader(new FileReader(txtFilename.getText()));
         			String line;
