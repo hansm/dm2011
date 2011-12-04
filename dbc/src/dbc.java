@@ -21,13 +21,14 @@ public class dbc extends Canvas
 {
 	private static JTextField kontroll;
 	
+	public final static dbc canvas = new dbc();
+	
 	private static JTextField txtFilename;
 	private static JLabel lblElements;
 	private static JLabel lblClusters;
 	
 	public static ArrayList<P> points = new ArrayList<P>();
 	
-//	private static int clusters = 0;
 	public static Color[] colors = new Color[24];
 	
 	
@@ -36,6 +37,20 @@ public class dbc extends Canvas
     public dbc()
     {
     }
+    
+    // Clustering algorithms
+    public static void clustering1() {
+    	kontroll.setText("Clustering 1 algorithm: running");
+    }
+    
+    public static void clustering2() {
+    	kontroll.setText("Clustering 2 algorithm: running");
+    }
+    
+    public static void clustering3() {
+    	kontroll.setText("Clustering 3 algorithm: running");
+    }
+    
     public void paint(Graphics g)
     {
     	g.setColor(Color.gray);
@@ -86,26 +101,39 @@ public class dbc extends Canvas
 		lblClusters.setText(Integer.toString(hs.size()));
     }
     
-    // Clustering algorithms
-    public static void clustering1() {
-    	kontroll.setText("Clustering 1 algorithm: running");
+    public static void clustering(int c) {
+    	switch(c) {
+    	case 1:
+    		clustering1();
+    		break;
+    	case 2:
+    		clustering2();
+    		break;
+    	case 3:
+    		clustering3();
+    		break;
+    	case 4:
+    		klassifitseeri();
+    		break;
+    	}
+    	countClusters();
+    	canvas.repaint();
     }
     
-    public static void clustering2() {
-    	kontroll.setText("Clustering 2 algorithm: running");
+    public static void clearCanvas() {
+    	points.clear();
+		lblElements.setText("0");
+		lblClusters.setText("0");
+		canvas.repaint();
     }
     
-    public static void clustering3() {
-    	kontroll.setText("Clustering 3 algorithm: running");
-    }
-    
+  
     /**
      * @wbp.parser.entryPoint
      */
     public static void main(String[] args)
     {
     	createColors();
-        final dbc canvas = new dbc();
         canvas.setBackground(Color.WHITE);
         canvas.addMouseListener(new MouseAdapter() {
         	public void mouseClicked(MouseEvent e) {
@@ -132,18 +160,15 @@ public class dbc extends Canvas
         btnClear.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent e) {
-        		points.clear();
-        		lblElements.setText("0");
-        		lblClusters.setText("0");
-        		canvas.repaint();
+        		clearCanvas();
         	}
         });
-        btnClear.setBounds(24, 527, 227, 23);
+        btnClear.setBounds(24, 408, 227, 23);
         frmDensitybasedClustering.getContentPane().add(btnClear);
         
         JPanel panelStat = new JPanel();
         panelStat.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-        panelStat.setBounds(24, 408, 227, 108);
+        panelStat.setBounds(24, 442, 227, 108);
         frmDensitybasedClustering.getContentPane().add(panelStat);
         panelStat.setLayout(null);
         
@@ -214,31 +239,25 @@ public class dbc extends Canvas
         btnClustering3.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
-        		clustering3();
-        		canvas.repaint();
+        		clustering(3);
         	}
         });
         btnClustering2.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
-        		clustering2();
-        		canvas.repaint();
+        		clustering(2);
         	}
         });
         btnClustering1.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
-        		clustering1();
-        		
-        		canvas.repaint();
+        		clustering(1);
         	}
         });
         btnTestClustering.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
-        		klassifitseeri();
-        		countClusters();
-        		canvas.repaint();
+        		clustering(4);
         	}
         });
         btnOpenFile.addMouseListener(new MouseAdapter() {
