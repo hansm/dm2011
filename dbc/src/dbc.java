@@ -10,14 +10,19 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.border.BevelBorder;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 
 public class dbc extends Canvas
 {
@@ -28,9 +33,12 @@ public class dbc extends Canvas
 	private static JTextField txtFilename;
 	private static JLabel lblElements;
 	private static JLabel lblClusters;
-
+	private static Choice choiceClusters;
+	
+	private static File currentDir;
 	
 	public static ArrayList<P> points = new ArrayList<P>();
+	public static HashSet clusters = new HashSet();
 	
 	public static Color[] colors = new Color[24];
 	
@@ -60,9 +68,11 @@ public class dbc extends Canvas
     {
     	g.setColor(Color.gray);
     	for (P point : points) {
-    		if (point.cluster > -1) g.setColor(colors[point.cluster%colors.length]);
-    		g.fillOval(point.x-(int)(dotSize/2), point.y-(int)(dotSize/2), dotSize, dotSize);
-    		g.setColor(Color.gray);
+    		if (clusters.size() == 0 || choiceClusters.getSelectedIndex() == 0 || point.cluster == Integer.parseInt(choiceClusters.getSelectedItem())-1) {
+	    		if (point.cluster > -1) g.setColor(colors[point.cluster%colors.length]);
+	    		g.fillOval(point.x-(int)(dotSize/2), point.y-(int)(dotSize/2), dotSize, dotSize);
+	    		g.setColor(Color.gray);
+    		}
     	}
     	
 //    	for (int i = 0; i < colors.length; i++) {
@@ -99,11 +109,11 @@ public class dbc extends Canvas
     }
     
     public static void countClusters() {
-    	HashSet hs = new HashSet();
+    	clusters.clear();
 		for (P p : points) {
-			hs.add(p.cluster);
+			clusters.add(p.cluster+1);
 		}
-		lblClusters.setText(Integer.toString(hs.size()));
+		lblClusters.setText(Integer.toString(clusters.size()));
     }
     
     public static void clustering(int c) {
@@ -122,20 +132,23 @@ public class dbc extends Canvas
     		break;
     	}
     	countClusters();
+    	choiceClusters.removeAll();
+    	choiceClusters.add("--- All ---");
+    	for (Object cluster : clusters) {
+    		choiceClusters.add(cluster.toString());
+    	}
     	canvas.repaint();
     }
     
     public static void clearCanvas() {
     	points.clear();
+    	clusters.clear();
 		lblElements.setText("0");
 		lblClusters.setText("0");
+		choiceClusters.removeAll();
 		canvas.repaint();
     }
-    
-    
- 
 
-    
   
     /**
      * @wbp.parser.entryPoint
@@ -151,7 +164,7 @@ public class dbc extends Canvas
         	}
         	
         });
-        canvas.setBounds(273, 50, 500, 500);
+        canvas.setBounds(275, 40, 500, 500);
         JFrame frmDensitybasedClustering = new JFrame();
         frmDensitybasedClustering.setIconImage(Toolkit.getDefaultToolkit().getImage(dbc.class.getResource("/images/icon-logo.gif")));
         frmDensitybasedClustering.setTitle("Density-based clustering");
@@ -174,12 +187,12 @@ public class dbc extends Canvas
         		clearCanvas();
         	}
         });
-        btnClear.setBounds(24, 408, 227, 23);
+        btnClear.setBounds(24, 428, 227, 23);
         frmDensitybasedClustering.getContentPane().add(btnClear);
         
         JPanel panelStat = new JPanel();
         panelStat.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-        panelStat.setBounds(24, 442, 227, 108);
+        panelStat.setBounds(24, 462, 227, 75);
         frmDensitybasedClustering.getContentPane().add(panelStat);
         panelStat.setLayout(null);
         
@@ -188,57 +201,57 @@ public class dbc extends Canvas
         panelStat.add(lblElementsLabel);
         
         lblElements = new JLabel("0");
-        lblElements.setBounds(82, 11, 46, 14);
+        lblElements.setBounds(106, 11, 46, 14);
         panelStat.add(lblElements);
         
         JLabel lblClustersLabel = new JLabel("Clusters:");
-        lblClustersLabel.setBounds(10, 28, 62, 14);
+        lblClustersLabel.setBounds(10, 31, 62, 14);
         panelStat.add(lblClustersLabel);
         
         lblClusters = new JLabel("");
-        lblClusters.setBounds(82, 28, 46, 14);
+        lblClusters.setBounds(106, 31, 46, 14);
         panelStat.add(lblClusters);
+        
+        choiceClusters = new Choice();
+        choiceClusters.addItemListener(new ItemListener() {
+        	public void itemStateChanged(ItemEvent arg0) {
+//        		System.out.println(choiceClusters.getSelectedIndex());
+        		canvas.repaint();
+        	}
+        });
+        choiceClusters.setBounds(106, 48, 101, 20);
+        panelStat.add(choiceClusters);
+        
+        JLabel lblShowLabel = new JLabel("Show cluster");
+        lblShowLabel.setBounds(10, 51, 94, 14);
+        panelStat.add(lblShowLabel);
         
         JPanel panelCanvas = new JPanel();
         panelCanvas.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-        panelCanvas.setBounds(268, 45, 510, 510);
+        panelCanvas.setBounds(270, 35, 510, 510);
         frmDensitybasedClustering.getContentPane().add(panelCanvas);
         panelCanvas.setLayout(null);
         
         JPanel panelInput = new JPanel();
         panelInput.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-        panelInput.setBounds(24, 161, 227, 75);
+        panelInput.setBounds(24, 181, 227, 75);
         frmDensitybasedClustering.getContentPane().add(panelInput);
         panelInput.setLayout(null);
         
         txtFilename = new JTextField();
-        txtFilename.setBounds(10, 11, 167, 20);
+        txtFilename.setBounds(10, 11, 207, 20);
         panelInput.add(txtFilename);
-        txtFilename.setText("input.csv");
         txtFilename.setColumns(10);
         
-        JButton btnReadFile = new JButton("Read Data From File");
-        btnReadFile.setHorizontalAlignment(SwingConstants.LEFT);
-        btnReadFile.setIcon(null);
-        btnReadFile.setBounds(10, 40, 207, 23);
-        panelInput.add(btnReadFile);
-        
-        JButton btnOpenFile = new JButton("");
-        btnOpenFile.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent arg0) {
-        		
-        	}
-        });
-        btnOpenFile.addMouseListener(new MouseAdapter() {
-        	
-        });
+        JButton btnOpenFile = new JButton("Open CSV File");
+        btnOpenFile.setHorizontalAlignment(SwingConstants.LEFT);
         btnOpenFile.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-open.gif")));
-        btnOpenFile.setBounds(187, 10, 30, 23);
+        btnOpenFile.setBounds(10, 40, 207, 23);
         panelInput.add(btnOpenFile);
         
         JPanel panelCluster = new JPanel();
         panelCluster.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-        panelCluster.setBounds(24, 247, 227, 150);
+        panelCluster.setBounds(24, 267, 227, 150);
         frmDensitybasedClustering.getContentPane().add(panelCluster);
         panelCluster.setLayout(null);
         
@@ -268,8 +281,13 @@ public class dbc extends Canvas
         
         JLabel lblAuthors = new JLabel("Authors: Martin Loginov, Hans M\u00E4esalu, Sven Aller");
         lblAuthors.setHorizontalAlignment(SwingConstants.RIGHT);
-        lblAuthors.setBounds(415, 555, 363, 14);
+        lblAuthors.setBounds(415, 552, 363, 14);
         frmDensitybasedClustering.getContentPane().add(lblAuthors);
+        
+        JLabel lblHeader = new JLabel("");
+        lblHeader.setIcon(new ImageIcon(dbc.class.getResource("/images/header.gif")));
+        lblHeader.setBounds(10, 25, 250, 140);
+        frmDensitybasedClustering.getContentPane().add(lblHeader);
         btnClustering3.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
@@ -294,32 +312,45 @@ public class dbc extends Canvas
         		clustering(4);
         	}
         });
-        btnReadFile.addMouseListener(new MouseAdapter() {
+        btnOpenFile.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
         		try {
-        			BufferedReader in = new BufferedReader(new FileReader(txtFilename.getText()));
-        			String line;
-        			ArrayList<Point> pointsfromfile = new ArrayList<Point>();
-        			int maxX = 0;
-        			int maxY = 0;
-        		    while ((line = in.readLine()) != null) {
-        		        String[] line1 = line.split(",");
-        		        Point newPoint = new Point(Integer.parseInt(line1[0]),Integer.parseInt(line1[1])); 
-        		        if (newPoint.x > maxX) maxX = newPoint.x;
-        		        if (newPoint.y > maxY) maxY = newPoint.y;
-        		        pointsfromfile.add(newPoint);
-        		    }
-        		    in.close();
-        		    double changeX = 499d / maxX;
-        		    double changeY = 499d / maxY;
-        		    for (Point p : pointsfromfile) {
-        		    	p.x = (int)(p.x * changeX);
-        		    	p.y = (int)(p.y * changeY);
-        		    	points.add(new P(p));
-        		    }
-        		    lblElements.setText(Integer.toString(points.size()));
-        		    canvas.repaint();
+        			JFileChooser fileChooser = new JFileChooser("");
+        			if (currentDir != null) {
+        				fileChooser.setCurrentDirectory(currentDir);
+        			}
+        			FileFilter filter = new FileNameExtensionFilter("CSV Files", "csv");
+        			fileChooser.addChoosableFileFilter(filter);
+        	        int returnVal = fileChooser.showOpenDialog(null);
+        	        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        	            File file = fileChooser.getSelectedFile();
+        	        	currentDir = file.getAbsoluteFile();
+        	            txtFilename.setText(file.getName());
+	        			clearCanvas();
+	        			BufferedReader in = new BufferedReader(new FileReader(file));
+	        			String line;
+	        			ArrayList<Point> pointsfromfile = new ArrayList<Point>();
+	        			int maxX = 0;
+	        			int maxY = 0;
+	        		    while ((line = in.readLine()) != null) {
+	        		        String[] line1 = line.split(",");
+	        		        Point newPoint = new Point(Integer.parseInt(line1[0]),Integer.parseInt(line1[1])); 
+	        		        if (newPoint.x > maxX) maxX = newPoint.x;
+	        		        if (newPoint.y > maxY) maxY = newPoint.y;
+	        		        pointsfromfile.add(newPoint);
+	        		    }
+	        		    in.close();
+	        		    double changeX = 499d / maxX;
+	        		    double changeY = 499d / maxY;
+	        		    for (Point p : pointsfromfile) {
+	        		    	p.x = (int)(p.x * changeX);
+	        		    	p.y = (int)(p.y * changeY);
+	        		    	points.add(new P(p));
+	        		    }
+	        		    lblElements.setText(Integer.toString(points.size()));
+	        		    canvas.repaint();
+        	        }
 				} 
 				catch (IOException e) {
 					e.printStackTrace();
