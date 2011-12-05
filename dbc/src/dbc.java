@@ -1,6 +1,7 @@
 import java.awt.*;
 
 import javax.swing.*;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -155,6 +156,23 @@ public class dbc extends Canvas
      */
     public static void main(String[] args)
     {
+    	try {
+			UIManager.setLookAndFeel(
+			        UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (InstantiationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IllegalAccessException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
     	createColors();
         canvas.setBackground(Color.WHITE);
         canvas.addMouseListener(new MouseAdapter() {
@@ -195,36 +213,6 @@ public class dbc extends Canvas
         panelStat.setBounds(24, 462, 227, 75);
         frmDensitybasedClustering.getContentPane().add(panelStat);
         panelStat.setLayout(null);
-        
-        JLabel lblElementsLabel = new JLabel("Elements: ");
-        lblElementsLabel.setBounds(10, 11, 62, 14);
-        panelStat.add(lblElementsLabel);
-        
-        lblElements = new JLabel("0");
-        lblElements.setBounds(106, 11, 46, 14);
-        panelStat.add(lblElements);
-        
-        JLabel lblClustersLabel = new JLabel("Clusters:");
-        lblClustersLabel.setBounds(10, 31, 62, 14);
-        panelStat.add(lblClustersLabel);
-        
-        lblClusters = new JLabel("");
-        lblClusters.setBounds(106, 31, 46, 14);
-        panelStat.add(lblClusters);
-        
-        choiceClusters = new Choice();
-        choiceClusters.addItemListener(new ItemListener() {
-        	public void itemStateChanged(ItemEvent arg0) {
-//        		System.out.println(choiceClusters.getSelectedIndex());
-        		canvas.repaint();
-        	}
-        });
-        choiceClusters.setBounds(106, 48, 101, 20);
-        panelStat.add(choiceClusters);
-        
-        JLabel lblShowLabel = new JLabel("Show cluster");
-        lblShowLabel.setBounds(10, 51, 94, 14);
-        panelStat.add(lblShowLabel);
         
         JPanel panelCanvas = new JPanel();
         panelCanvas.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
@@ -288,6 +276,36 @@ public class dbc extends Canvas
         lblHeader.setIcon(new ImageIcon(dbc.class.getResource("/images/header.gif")));
         lblHeader.setBounds(10, 25, 250, 140);
         frmDensitybasedClustering.getContentPane().add(lblHeader);
+        
+        JLabel lblElementsLabel = new JLabel("Elements: ");
+        lblElementsLabel.setBounds(339, 11, 62, 14);
+        frmDensitybasedClustering.getContentPane().add(lblElementsLabel);
+        
+        lblElements = new JLabel("0");
+        lblElements.setBounds(400, 11, 46, 14);
+        frmDensitybasedClustering.getContentPane().add(lblElements);
+        
+        lblClusters = new JLabel("");
+        lblClusters.setBounds(526, 11, 46, 14);
+        frmDensitybasedClustering.getContentPane().add(lblClusters);
+        
+        JLabel lblClustersLabel = new JLabel("Clusters:");
+        lblClustersLabel.setBounds(468, 11, 62, 14);
+        frmDensitybasedClustering.getContentPane().add(lblClustersLabel);
+        
+        JLabel lblShowLabel = new JLabel("Show cluster");
+        lblShowLabel.setBounds(582, 11, 94, 14);
+        frmDensitybasedClustering.getContentPane().add(lblShowLabel);
+        
+        choiceClusters = new Choice();
+        choiceClusters.setBounds(678, 8, 101, 20);
+        frmDensitybasedClustering.getContentPane().add(choiceClusters);
+        choiceClusters.addItemListener(new ItemListener() {
+        	public void itemStateChanged(ItemEvent arg0) {
+//        		System.out.println(choiceClusters.getSelectedIndex());
+        		canvas.repaint();
+        	}
+        });
         btnClustering3.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
