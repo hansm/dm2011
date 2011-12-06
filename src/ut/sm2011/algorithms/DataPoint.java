@@ -1,21 +1,23 @@
 package ut.sm2011.algorithms;
 
+import java.awt.Point;
+
 public class DataPoint {
 
 	/**
 	 * Point x coordinate
 	 */
-	protected int x;
+	public int x;
 
 	/**
 	 * Point y coordinate
 	 */
-	protected int y;
+	public int y;
 	
 	/**
 	 * Cluster that point belongs to, 0 for noise
 	 */
-	protected int cluster;
+	public int cluster;
 	
 	/**
 	 * Whether this point is core point
@@ -58,6 +60,11 @@ public class DataPoint {
 		this.x = x;
 		this.y = y;
 	}
+	
+	public DataPoint(Point coords) {
+    	this.x = coords.x;
+    	this.y = coords.y;
+    }
 
 	/**
 	 * Calculate distance from this point to some other point

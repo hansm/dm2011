@@ -1,7 +1,7 @@
 package ut.sm2011;
 
 import java.util.Random;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import ut.sm2011.algorithms.*;
 
@@ -25,7 +25,7 @@ public class StartHere {
 		}
 	}
 	
-	public static void outPoints(Vector<DataPoint> points) {
+	public static void outPoints(ArrayList<DataPoint> points) {
 		for (DataPoint i : points) {
 			System.out.println(i.toString());
 		}
@@ -35,13 +35,17 @@ public class StartHere {
 	public static void main(String[] args) {
 		Random rand = new Random();
 		
-		Vector<DataPoint> points = new Vector<DataPoint>();
+		ArrayList<DataPoint> points = new ArrayList<DataPoint>();
 		for (int i = 0; i < 100; i++) {
 			points.add(new DataPoint(rand.nextInt(100), rand.nextInt(100)));
 		}
 		
 		ClusteringAlgorithm algorithm = new SNN(points, 20, 20, 0, 15);
-		algorithm.run();
+		try {
+			algorithm.run();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 		
 		outPoints(points);
 	}

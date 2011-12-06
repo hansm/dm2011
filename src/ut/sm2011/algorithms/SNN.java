@@ -3,7 +3,7 @@ package ut.sm2011.algorithms;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * Shared Nearest Neighbor (SNN) implementation.
@@ -18,13 +18,13 @@ public class SNN implements ClusteringAlgorithm {
 
 	private int linkThreshold;
 
-	private Vector<DataPoint> points;
+	private ArrayList<DataPoint> points;
 
 	/**
 	 * SNN clustering
 	 * 
 	 * @param points
-	 *            vector of points to cluster
+	 *            ArrayList of points to cluster
 	 * @param K
 	 *            number of most similar neighbors to compare
 	 * @param coreThreshold
@@ -34,7 +34,7 @@ public class SNN implements ClusteringAlgorithm {
 	 * @param linkThreshold
 	 *            similarity threshold for same cluster
 	 */
-	public SNN(Vector<DataPoint> points, int K, int coreThreshold,
+	public SNN(ArrayList<DataPoint> points, int K, int coreThreshold,
 			int noiseThreshold, int linkThreshold) {
 		this.points = points;
 		this.K = K;
@@ -47,10 +47,13 @@ public class SNN implements ClusteringAlgorithm {
 	 * @see ut.sm2011.algorithms.ClusteringAlgorithm#run()
 	 */
 	@Override
-	public int run() {
+	public int run() throws AlgorithmException {
 		if (points == null || points.size() == 0) {
-			System.out.println("Nothing to cluster.");
-			return 0;
+			throw new AlgorithmException("Nothing to cluster.");
+		}
+		
+		if (points.size() < K + 1) {
+			throw new AlgorithmException("You need at least K + 1 points to cluster.");
 		}
 
 		double[][] matrix = computeSimilarityMatrix();
