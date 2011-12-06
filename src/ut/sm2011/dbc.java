@@ -69,7 +69,7 @@ public class dbc extends Canvas
     	kontroll.setText("SNN algorithm: running");
     	ClusteringAlgorithm algorithm = new SNN(points, 5, 3, 3, 3);
     	try {
-    		algorithm.run();
+    		int clusters = algorithm.run();
     	} catch (Exception e) {
     		System.out.println(e.getMessage());
     		kontroll.setText(e.getMessage());

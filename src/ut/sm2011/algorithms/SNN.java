@@ -43,7 +43,9 @@ public class SNN implements ClusteringAlgorithm {
 		this.linkThreshold = linkThreshold;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see ut.sm2011.algorithms.ClusteringAlgorithm#run()
 	 */
 	@Override
@@ -51,15 +53,16 @@ public class SNN implements ClusteringAlgorithm {
 		if (points == null || points.size() == 0) {
 			throw new AlgorithmException("Nothing to cluster.");
 		}
-		
+
 		if (points.size() < K + 1) {
-			throw new AlgorithmException("You need at least K + 1 points to cluster.");
+			throw new AlgorithmException(
+					"You need at least K + 1 points to cluster.");
 		}
 
 		double[][] matrix = computeSimilarityMatrix();
 
 		matrix = getKNearest(matrix);
-		
+
 		int[][] similarityMatrix = createSNNMatrix(matrix);
 
 		findCoreAndNoise(similarityMatrix);
@@ -105,6 +108,7 @@ public class SNN implements ClusteringAlgorithm {
 			Arrays.sort(rowCopy);
 			kVal = rowCopy[K];
 
+			// remove all other connections
 			for (int j = 0; j < matrix[i].length; j++) {
 				if (matrix[i][j] > kVal) {
 					matrix[i][j] = 0;
@@ -205,9 +209,9 @@ public class SNN implements ClusteringAlgorithm {
 	 * is a cluster is either a representative point (core) or is connected to a
 	 * representative point.
 	 * 
-	 * @param similarity
+	 * @param similarityMatrix
 	 */
-	private int formClusters(int[][] similarity) {
+	private int formClusters(int[][] similarityMatrix) {
 		int cluster = 0;
 		int j;
 		Queue<Integer> queue = new LinkedList<Integer>();
@@ -220,31 +224,39 @@ public class SNN implements ClusteringAlgorithm {
 			// next cluster
 			cluster++;
 
-			// BFS to discover all clusters in graph
+			// BFS to connect core points into clusters
 			queue.add(i);
-			points.get(i).setCluster(cluster);
 			while (!queue.isEmpty()) {
-				j = queue.poll();
+				j = (int) queue.poll();
+				
+				// set cluster
+				points.get(j).setCluster(cluster);
 
 				for (int k = 0; k < points.size(); k++) {
-					if (similarity[j][k] > 0
-							&& points.get(k).getCluster() == -1) {
-						// set cluster
-						points.get(k).setCluster(cluster);
-
-						// only go forward from core points
-						if (points.get(k).isCore()) {
-							queue.add(k);
-						}
+					if (similarityMatrix[j][k] > 0
+							&& points.get(k).getCluster() == -1
+							&& points.get(k).isCore()) {
+						queue.add(k);
 					}
 				}
 			}
 		}
 
-		// just in case something was not connected, add to noise
+		// connect all border points to nearest core point
+		DataPoint connectTo;
+		int connectToSimilarity;
 		for (int i = 0; i < points.size(); i++) {
-			if (points.get(i).getCluster() == -1) {
-				points.get(i).setCluster(0);
+			if (points.get(i).getCluster() == -1 && !points.get(i).isCore()) {
+				connectTo = null;
+				connectToSimilarity = 0;
+				for (j = 0; j < points.size(); j++) {
+					if (similarityMatrix[i][j] > 0 && points.get(j).isCore() && (connectTo == null || connectToSimilarity < similarityMatrix[i][j])) {
+						connectTo = points.get(j);
+						connectToSimilarity = similarityMatrix[i][j];
+					}
+				}
+				
+				points.get(i).setCluster(connectTo == null ? 0 : connectTo.getCluster());
 			}
 		}
 
