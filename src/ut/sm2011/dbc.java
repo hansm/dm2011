@@ -70,6 +70,7 @@ public class dbc extends Canvas
     	ClusteringAlgorithm algorithm = new SNN(points, 5, 3, 3, 3);
     	try {
     		int clusters = algorithm.run();
+    		kontroll.setText("SNN algorithm: finished");
     	} catch (Exception e) {
     		System.out.println(e.getMessage());
     		kontroll.setText(e.getMessage());
@@ -78,9 +79,10 @@ public class dbc extends Canvas
     
     public void paint(Graphics g)
     {
+    	int filterCluster = (choiceClusters.getSelectedIndex() == -1 || choiceClusters.getSelectedIndex() == 0 || choiceClusters.getSelectedIndex() == 1) ? 0 : Integer.parseInt(choiceClusters.getSelectedItem());
     	g.setColor(Color.gray);
     	for (DataPoint point : points) {
-    		if (clusters.size() == 0 || choiceClusters.getSelectedIndex() == 0 || point.cluster == Integer.parseInt(choiceClusters.getSelectedItem())-1) {
+    		if (clusters.size() == 0 || choiceClusters.getSelectedIndex() == 0 || point.cluster == filterCluster) {
 	    		if (point.cluster > -1) g.setColor(colors[point.cluster%colors.length]);
 	    		g.fillOval(point.x-(int)(dotSize/2), point.y-(int)(dotSize/2), dotSize, dotSize);
 	    		g.setColor(Color.gray);
@@ -123,7 +125,10 @@ public class dbc extends Canvas
     public static void countClusters() {
     	clusters.clear();
 		for (DataPoint p : points) {
-			clusters.add(p.cluster+1);
+			if (p.getCluster() == 0) {
+				continue;
+			}
+			clusters.add(p.getCluster());
 		}
 		lblClusters.setText(Integer.toString(clusters.size()));
     }
@@ -146,6 +151,7 @@ public class dbc extends Canvas
     	countClusters();
     	choiceClusters.removeAll();
     	choiceClusters.add("--- All ---");
+    	choiceClusters.add("noise");
     	for (Object cluster : clusters) {
     		choiceClusters.add(cluster.toString());
     	}
