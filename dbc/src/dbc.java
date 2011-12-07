@@ -37,6 +37,7 @@ public class dbc extends Canvas
 	private static JLabel lblClusters;
 	private static List listClusters = new List();
 	
+	
 	private static File currentDir;
 	
 	public static ArrayList<DataPoint> points = new ArrayList<DataPoint>();
@@ -89,16 +90,7 @@ public class dbc extends Canvas
     public void paint(Graphics g)
     {
     	g.setColor(Color.gray);
-    	/*
-    	for (DataPoint point : points) {
-    		if (clusters.size() == 0 || choiceClusters.getSelectedIndex() == 0 || point.cluster == Integer.parseInt(choiceClusters.getSelectedItem())-1) {
-	    		if (point.cluster > -1) g.setColor(colors[point.cluster%colors.length]);
-	    		g.fillOval(point.x-(int)(dotSize/2), point.y-(int)(dotSize/2), dotSize, dotSize);
-	    		g.setColor(Color.gray);
-    		}
-    	}
-    	*/
-    	
+    	    	
     	if (clusters.size() == 0 || listClusters.getSelectedItem() == null) {
     		for (DataPoint point : points) {
         			g.setColor(Color.gray);
@@ -107,21 +99,19 @@ public class dbc extends Canvas
         	}
     	} else if (listClusters.getSelectedIndex() == 0) {
 	    	for (DataPoint point : points) {
-	//    		if (clusters.size() == 0 || listClusters.getSelectedIndex() == 0 || point.cluster == listClusters.getSelectedIndex()-1) {
 	    			g.setColor(colors[(point.cluster+1)%colors.length]);
 		    		g.fillOval(point.x-(int)(dotSize/2), point.y-(int)(dotSize/2), dotSize, dotSize);
 		    		g.setColor(Color.gray);
 	    		}
     	} else {
 	    	for (DataPoint point : points) {
-	//    		if (clusters.size() == 0 || listClusters.getSelectedIndex() == 0 || point.cluster == listClusters.getSelectedIndex()-1) {
 	    		g.setColor(Color.lightGray);
 	    		if (point.cluster == Integer.parseInt(listClusters.getSelectedItem())-1) g.setColor(colors[(point.cluster+1)%colors.length]);
     	    	g.fillOval(point.x-(int)(dotSize/2), point.y-(int)(dotSize/2), dotSize, dotSize);
 	    		g.setColor(Color.lightGray);
 	    	}
 	    }
-
+    	g.setColor(Color.gray);
     	
 //    	for (int i = 0; i < colors.length; i++) {
 //    		g.setColor(colors[i]);
@@ -227,6 +217,7 @@ public class dbc extends Canvas
 		}
 
     	createColors();
+    	
         canvas.setBackground(Color.WHITE);
         canvas.addMouseListener(new MouseAdapter() {
         	public void mouseClicked(MouseEvent e) {
@@ -250,12 +241,6 @@ public class dbc extends Canvas
         frmDensitybasedClustering.getContentPane().add(kontroll);
         kontroll.setColumns(10);
         
-        JPanel panelStat = new JPanel();
-        panelStat.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-        panelStat.setBounds(175, 552, 227, 75);
-        frmDensitybasedClustering.getContentPane().add(panelStat);
-        panelStat.setLayout(null);
-        
         JPanel panelCanvas = new JPanel();
         panelCanvas.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
         panelCanvas.setBounds(362, 38, 510, 510);
@@ -264,48 +249,48 @@ public class dbc extends Canvas
         
         JPanel panelInput = new JPanel();
         panelInput.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-        panelInput.setBounds(24, 181, 315, 44);
+        panelInput.setBounds(15, 178, 327, 44);
         frmDensitybasedClustering.getContentPane().add(panelInput);
         panelInput.setLayout(null);
         
         txtFilename = new JTextField();
-        txtFilename.setBounds(10, 11, 225, 20);
+        txtFilename.setBounds(10, 11, 265, 20);
         panelInput.add(txtFilename);
         txtFilename.setColumns(10);
         
         JButton btnOpenFile = new JButton("");
         btnOpenFile.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-open.gif")));
-        btnOpenFile.setBounds(245, 11, 32, 23);
+        btnOpenFile.setBounds(285, 8, 32, 23);
         panelInput.add(btnOpenFile);
         
         JPanel panelCluster = new JPanel();
         panelCluster.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-        panelCluster.setBounds(24, 236, 315, 276);
+        panelCluster.setBounds(15, 233, 327, 276);
         frmDensitybasedClustering.getContentPane().add(panelCluster);
         panelCluster.setLayout(null);
         
         JButton btnTestClustering = new JButton("ClusterTest");
         btnTestClustering.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
         btnTestClustering.setHorizontalAlignment(SwingConstants.LEFT);
-        btnTestClustering.setBounds(10, 11, 165, 23);
+        btnTestClustering.setBounds(10, 11, 307, 23);
         panelCluster.add(btnTestClustering);
         
         JButton btnClustering1 = new JButton("Clustering 1");
         btnClustering1.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
         btnClustering1.setHorizontalAlignment(SwingConstants.LEFT);
-        btnClustering1.setBounds(10, 45, 165, 23);
+        btnClustering1.setBounds(10, 45, 307, 23);
         panelCluster.add(btnClustering1);
         
         JButton btnClustering2 = new JButton("Clustering 2");
         btnClustering2.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
         btnClustering2.setHorizontalAlignment(SwingConstants.LEFT);
-        btnClustering2.setBounds(12, 79, 163, 23);
+        btnClustering2.setBounds(12, 79, 305, 23);
         panelCluster.add(btnClustering2);
         
         JButton btnClustering3 = new JButton("SNN");
         btnClustering3.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
         btnClustering3.setHorizontalAlignment(SwingConstants.LEFT);
-        btnClustering3.setBounds(12, 113, 163, 23);
+        btnClustering3.setBounds(12, 113, 305, 23);
         panelCluster.add(btnClustering3);
         
         snnK = new JTextField();
@@ -315,71 +300,71 @@ public class dbc extends Canvas
         snnK.setColumns(10);
         
         JLabel lblsnnK = new JLabel("K:");
-        lblsnnK.setBounds(12, 147, 81, 14);
+        lblsnnK.setBounds(12, 145, 81, 14);
         panelCluster.add(lblsnnK);
         
         JLabel lblsnnCore = new JLabel("Core threshold:");
-        lblsnnCore.setBounds(10, 172, 81, 14);
+        lblsnnCore.setBounds(10, 170, 81, 14);
         panelCluster.add(lblsnnCore);
         
         snnCore = new JTextField();
         snnCore.setText("3");
         snnCore.setColumns(10);
-        snnCore.setBounds(101, 169, 42, 20);
+        snnCore.setBounds(101, 167, 42, 20);
         panelCluster.add(snnCore);
         
         JLabel lblsnnNoise = new JLabel("Noise threshold:");
-        lblsnnNoise.setBounds(169, 145, 81, 14);
+        lblsnnNoise.setBounds(184, 145, 81, 14);
         panelCluster.add(lblsnnNoise);
         
         JLabel lblsnnLink = new JLabel("Link threshold:");
-        lblsnnLink.setBounds(169, 170, 81, 14);
+        lblsnnLink.setBounds(184, 170, 81, 14);
         panelCluster.add(lblsnnLink);
         
         snnNoise = new JTextField();
         snnNoise.setText("3");
         snnNoise.setColumns(10);
-        snnNoise.setBounds(260, 141, 42, 20);
+        snnNoise.setBounds(275, 141, 42, 20);
         panelCluster.add(snnNoise);
         
         snnLink = new JTextField();
         snnLink.setText("3");
         snnLink.setColumns(10);
-        snnLink.setBounds(260, 167, 42, 20);
+        snnLink.setBounds(275, 167, 42, 20);
         panelCluster.add(snnLink);
         
         JLabel lblAuthors = new JLabel("Authors: Martin Loginov, Hans M\u00E4esalu, Sven Aller");
         lblAuthors.setHorizontalAlignment(SwingConstants.RIGHT);
-        lblAuthors.setBounds(509, 549, 363, 14);
+        lblAuthors.setBounds(621, 549, 363, 14);
         frmDensitybasedClustering.getContentPane().add(lblAuthors);
         
         JLabel lblHeader = new JLabel("");
         lblHeader.setIcon(new ImageIcon(dbc.class.getResource("/images/header.gif")));
-        lblHeader.setBounds(78, 13, 250, 140);
+        lblHeader.setBounds(50, 27, 250, 140);
         frmDensitybasedClustering.getContentPane().add(lblHeader);
         
         JLabel lblElementsLabel = new JLabel("Elements: ");
-        lblElementsLabel.setBounds(464, 13, 62, 14);
+        lblElementsLabel.setBounds(880, 43, 62, 14);
         frmDensitybasedClustering.getContentPane().add(lblElementsLabel);
         
         lblElements = new JLabel("0");
-        lblElements.setBounds(525, 13, 46, 14);
+        lblElements.setBounds(938, 43, 46, 14);
         frmDensitybasedClustering.getContentPane().add(lblElements);
         
         lblClusters = new JLabel("");
-        lblClusters.setBounds(651, 13, 46, 14);
+        lblClusters.setBounds(938, 68, 46, 14);
         frmDensitybasedClustering.getContentPane().add(lblClusters);
         
         JLabel lblClustersLabel = new JLabel("Clusters:");
-        lblClustersLabel.setBounds(593, 13, 62, 14);
+        lblClustersLabel.setBounds(880, 68, 62, 14);
         frmDensitybasedClustering.getContentPane().add(lblClustersLabel);
         
         JLabel lblShowLabel = new JLabel("Show cluster");
-        lblShowLabel.setBounds(882, 34, 94, 14);
+        lblShowLabel.setBounds(880, 93, 94, 14);
         frmDensitybasedClustering.getContentPane().add(lblShowLabel);
         
         JButton btnClear = new JButton("Clear");
-        btnClear.setBounds(24, 523, 315, 23);
+        btnClear.setBounds(15, 520, 327, 23);
         frmDensitybasedClustering.getContentPane().add(btnClear);
         btnClear.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-delete.gif")));
         
@@ -392,7 +377,7 @@ public class dbc extends Canvas
         });
         
         listClusters.setMultipleSelections(false);
-        listClusters.setBounds(883, 54, 100, 489);
+        listClusters.setBounds(883, 113, 100, 430);
         frmDensitybasedClustering.getContentPane().add(listClusters);
         btnClear.addMouseListener(new MouseAdapter() {
         	@Override
@@ -455,6 +440,7 @@ public class dbc extends Canvas
 	        		    in.close();
 	        		    double changeX = 499d / maxX;
 	        		    double changeY = 499d / maxY;
+	        		    
 	        		    for (Point p : pointsfromfile) {
 	        		    	p.x = (int)(p.x * changeX);
 	        		    	p.y = (int)(p.y * changeY);
