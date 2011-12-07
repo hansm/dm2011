@@ -20,6 +20,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.border.BevelBorder;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
@@ -38,7 +39,7 @@ public class dbc extends Canvas
 	
 	private static File currentDir;
 	
-	public static ArrayList<P> points = new ArrayList<P>();
+	public static ArrayList<DataPoint> points = new ArrayList<DataPoint>();
 	public static HashSet clusters = new HashSet();
 	
 	public static Color[] colors = new Color[24];
@@ -62,13 +63,21 @@ public class dbc extends Canvas
     }
     
     public static void clustering3() {
-    	kontroll.setText("Clustering 3 algorithm: running");
+    	kontroll.setText("SNN algorithm: running");
+    	ClusteringAlgorithm algorithm = new SNN(points, 5, 3, 3, 3);
+    	try {
+    		int clusters = algorithm.run();
+    		kontroll.setText("SNN algorithm: finished");
+    	} catch (Exception e) {
+    		System.out.println(e.getMessage());
+    		kontroll.setText(e.getMessage());
+    	}
     }
     
     public void paint(Graphics g)
     {
     	g.setColor(Color.gray);
-    	for (P point : points) {
+    	for (DataPoint point : points) {
     		if (clusters.size() == 0 || choiceClusters.getSelectedIndex() == 0 || point.cluster == Integer.parseInt(choiceClusters.getSelectedItem())-1) {
 	    		if (point.cluster > -1) g.setColor(colors[point.cluster%colors.length]);
 	    		g.fillOval(point.x-(int)(dotSize/2), point.y-(int)(dotSize/2), dotSize, dotSize);
@@ -86,13 +95,13 @@ public class dbc extends Canvas
     
     public static void addPoint(Point p) 
     {
-    	points.add(new P(p)); 
+    	points.add(new DataPoint(p)); 
     	lblElements.setText(Integer.toString(points.size()));
 //    	kontroll.setText((p.x / 50) + " " + (4 * p.y / 125) + " = " + (int)(Math.floor(p.x / 125) + 4 * Math.floor(p.y / 125)));
     }
     
     public static void klassifitseeri() {
-    	for (P point : points) {
+    	for (DataPoint point : points) {
     		point.cluster = (int)(Math.floor(point.x / 125) + 4 * Math.floor(point.y / 125));
     	}
     }
@@ -111,7 +120,7 @@ public class dbc extends Canvas
     
     public static void countClusters() {
     	clusters.clear();
-		for (P p : points) {
+		for (DataPoint p : points) {
 			clusters.add(p.cluster+1);
 		}
 		lblClusters.setText(Integer.toString(clusters.size()));
@@ -261,7 +270,7 @@ public class dbc extends Canvas
         btnClustering2.setBounds(12, 79, 205, 23);
         panelCluster.add(btnClustering2);
         
-        JButton btnClustering3 = new JButton("Clustering 3");
+        JButton btnClustering3 = new JButton("SNN");
         btnClustering3.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
         btnClustering3.setHorizontalAlignment(SwingConstants.LEFT);
         btnClustering3.setBounds(12, 113, 205, 23);
@@ -364,7 +373,7 @@ public class dbc extends Canvas
 	        		    for (Point p : pointsfromfile) {
 	        		    	p.x = (int)(p.x * changeX);
 	        		    	p.y = (int)(p.y * changeY);
-	        		    	points.add(new P(p));
+	        		    	points.add(new DataPoint(p));
 	        		    }
 	        		    lblElements.setText(Integer.toString(points.size()));
 	        		    canvas.repaint();

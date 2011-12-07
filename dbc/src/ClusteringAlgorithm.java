@@ -1,5 +1,3 @@
-package ut.sm2011.algorithms;
-
 /**
  * Clustering algorithm interface
  */

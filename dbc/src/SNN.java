@@ -1,5 +1,3 @@
-package ut.sm2011.algorithms;
-
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
