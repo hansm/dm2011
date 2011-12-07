@@ -59,7 +59,15 @@ public class dbc extends Canvas
     // Type P: x, y, cluster (default -1)
     // ArrayList<P> points
     public static void clustering1() {
-    	kontroll.setText("Clustering 1 algorithm: running");
+    	kontroll.setText("DBSCAN algorithm: running");
+    	ClusteringAlgorithm dbscan = new DBSCAN(points, 5, 10.0);
+    	try {
+			int clusters = dbscan.run();
+		} catch (AlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	kontroll.setText("DBSCAN algorithm: finished");
     }
     
     public static void clustering2() {
