@@ -35,8 +35,7 @@ public class dbc extends Canvas
 	private static JTextField txtFilename;
 	private static JLabel lblElements;
 	private static JLabel lblClusters;
-	private static List listClusters = new List();
-	
+	private static List listClusters;
 	
 	private static File currentDir;
 	
@@ -47,10 +46,10 @@ public class dbc extends Canvas
 	
 	
 	public static int dotSize = 8;
-	private static JTextField snnK;
-	private static JTextField snnCore;
-	private static JTextField snnNoise;
-	private static JTextField snnLink;
+	private static JSpinner snnK;
+	private static JSpinner snnCore;
+	private static JSpinner snnNoise;
+	private static JSpinner snnLink;
 	
     public dbc()
     {
@@ -77,7 +76,7 @@ public class dbc extends Canvas
     
     public static void clustering3() {
     	kontroll.setText("SNN algorithm: running");
-    	ClusteringAlgorithm algorithm = new SNN(points, Integer.parseInt(snnK.getText()), Integer.parseInt(snnCore.getText()), Integer.parseInt(snnNoise.getText()), Integer.parseInt(snnLink.getText()));
+    	ClusteringAlgorithm algorithm = new SNN(points, (Integer) snnK.getValue(), (Integer) snnCore.getValue(), (Integer) snnNoise.getValue(), (Integer) snnLink.getValue());
     	try {
     		int clusters = algorithm.run();
     		kontroll.setText("SNN algorithm: finished");
@@ -275,7 +274,7 @@ public class dbc extends Canvas
         btnTestClustering.setBounds(10, 11, 307, 23);
         panelCluster.add(btnTestClustering);
         
-        JButton btnClustering1 = new JButton("Clustering 1");
+        JButton btnClustering1 = new JButton("DBSCAN");
         btnClustering1.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
         btnClustering1.setHorizontalAlignment(SwingConstants.LEFT);
         btnClustering1.setBounds(10, 45, 307, 23);
@@ -293,11 +292,10 @@ public class dbc extends Canvas
         btnClustering3.setBounds(12, 113, 305, 23);
         panelCluster.add(btnClustering3);
         
-        snnK = new JTextField();
-        snnK.setText("5");
+        snnK = new JSpinner();
+        snnK.setModel(new SpinnerNumberModel(new Integer(5), new Integer(0), null, new Integer(1)));
         snnK.setBounds(101, 141, 42, 20);
         panelCluster.add(snnK);
-        snnK.setColumns(10);
         
         JLabel lblsnnK = new JLabel("K:");
         lblsnnK.setBounds(12, 145, 81, 14);
@@ -307,9 +305,8 @@ public class dbc extends Canvas
         lblsnnCore.setBounds(10, 170, 81, 14);
         panelCluster.add(lblsnnCore);
         
-        snnCore = new JTextField();
-        snnCore.setText("3");
-        snnCore.setColumns(10);
+        snnCore = new JSpinner();
+        snnCore.setModel(new SpinnerNumberModel(new Integer(3), new Integer(0), null, new Integer(1)));
         snnCore.setBounds(101, 167, 42, 20);
         panelCluster.add(snnCore);
         
@@ -321,15 +318,13 @@ public class dbc extends Canvas
         lblsnnLink.setBounds(184, 170, 81, 14);
         panelCluster.add(lblsnnLink);
         
-        snnNoise = new JTextField();
-        snnNoise.setText("3");
-        snnNoise.setColumns(10);
+        snnNoise = new JSpinner();
+        snnNoise.setModel(new SpinnerNumberModel(new Integer(3), new Integer(0), null, new Integer(1)));
         snnNoise.setBounds(275, 141, 42, 20);
         panelCluster.add(snnNoise);
         
-        snnLink = new JTextField();
-        snnLink.setText("3");
-        snnLink.setColumns(10);
+        snnLink = new JSpinner();
+        snnLink.setModel(new SpinnerNumberModel(new Integer(3), new Integer(0), null, new Integer(1)));
         snnLink.setBounds(275, 167, 42, 20);
         panelCluster.add(snnLink);
         
