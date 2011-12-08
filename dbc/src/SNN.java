@@ -134,14 +134,15 @@ public class SNN implements ClusteringAlgorithm {
 		}
 
 		for (int i = 0; i < m.length; i++) {
-			for (int j = 0; j < m.length; j++) {
-				if (i == j) {
+			for (int j = i + 1; j < m.length; j++) {
+				if (matrix[i][j] == 0 || matrix[j][i] == 0) {
 					continue;
 				}
 
 				for (int k = 0; k < m.length; k++) {
 					if (matrix[i][k] > 0 && matrix[j][k] > 0) {
 						m[i][j]++;
+						m[j][i]++;
 					}
 				}
 			}
@@ -177,7 +178,6 @@ public class SNN implements ClusteringAlgorithm {
 	 */
 	private void findCoreAndNoise(int[][] similarityMatrix) {
 		int[] linksTotal = calcLinksTotal(similarityMatrix);
-
 		for (int i = 0; i < linksTotal.length; i++) {
 			// check if is core
 			points.get(i).setCore(linksTotal[i] >= coreThreshold);
