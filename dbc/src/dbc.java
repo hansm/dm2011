@@ -103,9 +103,15 @@ public class dbc extends Canvas
 		    		g.setColor(Color.gray);
 	    		}
     	} else {
+    		int filterCluster;
+    		if (listClusters.getSelectedIndex() == 1) {
+    			filterCluster = 0;
+    		} else {
+    			filterCluster = Integer.parseInt(listClusters.getSelectedItem());
+    		}
 	    	for (DataPoint point : points) {
 	    		g.setColor(Color.lightGray);
-	    		if (point.cluster == Integer.parseInt(listClusters.getSelectedItem())-1) g.setColor(colors[(point.cluster+1)%colors.length]);
+	    		if (point.cluster == filterCluster) g.setColor(colors[(point.cluster+1)%colors.length]);
     	    	g.fillOval(point.x-(int)(dotSize/2), point.y-(int)(dotSize/2), dotSize, dotSize);
 	    		g.setColor(Color.lightGray);
 	    	}
@@ -149,7 +155,10 @@ public class dbc extends Canvas
     public static void countClusters() {
     	clusters.clear();
 		for (DataPoint p : points) {
-			clusters.add(p.cluster+1);
+			if (p.getCluster() == 0) {
+				continue;
+			}
+			clusters.add(p.getCluster());
 		}
 		lblClusters.setText(Integer.toString(clusters.size()));
     }
@@ -174,7 +183,7 @@ public class dbc extends Canvas
     	
     	listClusters.add("--- All ---");
     	listClusters.select(0);
-
+    	listClusters.add("Noise");
     	
     	for (Object cluster : clusters) {
     		listClusters.add(cluster.toString());
