@@ -71,7 +71,15 @@ public class dbc extends Canvas
     }
     
     public static void clustering2() {
-    	kontroll.setText("Clustering 2 algorithm: running");
+    	kontroll.setText("DCBOR algorithm: running");
+    	ClusteringAlgorithm dcbor = new DCBOR(points, 1.0);
+    	try {
+			int clusters = dcbor.run();
+		} catch (AlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	kontroll.setText("DCBOR algorithm: finished");
     }
     
     public static void clustering3() {
