@@ -55,17 +55,63 @@ public class DCBOR implements ClusteringAlgorithm {
 //			}
 //		}
 		createDensityList();
+		int numClusters = 0;
+		double threshold = 0.0;
+		ArrayList<PointDensity> seedlist;
+		ArrayList<PointDensity> resultlist;
 		
 		//Remove the outliers, mark as noise = 0
+		//Find the threshold 
 		//and initialize the points to unclustered = -1
-		for(int i = 0; i < dpoints.length; i++)
+		for(int i = 0; i < dpoints.length; i++){
 			if(dpoints[i].density / dpoints[dpoints.length-1].density > ratio)
 				dpoints[i].datapoint.cluster = 0;
 			else
 				dpoints[i].datapoint.cluster = -1;
+			
+			if(dpoints[i].neighbors[0].distance > threshold)
+				threshold = dpoints[i].neighbors[0].distance;
+		}
 		
-		int numClusters = 0;
-		return 0;
+		PointDensity p;
+		for(int i = 0; i< dpoints.length; i++){
+			if(dpoints[i].datapoint.cluster != -1)
+				continue;
+			
+			numClusters++;
+			
+			dpoints[i].datapoint.cluster = numClusters;
+			seedlist = appendPointsUnderThreshold(dpoints[i], threshold);
+			if(!seedlist.isEmpty()){
+				for(int j = 0; j<seedlist.size();j++)
+					seedlist.get(j).datapoint.cluster = numClusters;
+				
+				while(!seedlist.isEmpty()){
+					p = seedlist.remove(0);
+					resultlist = appendPointsUnderThreshold(p, threshold);
+					if(!resultlist.isEmpty()){
+						for(int j = 0; j < resultlist.size();j++)
+							if(resultlist.get(j).datapoint.cluster == -1){
+								seedlist.add(resultlist.get(j));
+								resultlist.get(j).datapoint.cluster = numClusters;
+							}
+					}
+				}
+			
+			}
+		}
+		
+
+		return numClusters;
+	}
+	
+	private ArrayList<PointDensity> appendPointsUnderThreshold(PointDensity p, double threshold){
+		ArrayList<PointDensity> arr = new ArrayList<PointDensity>();
+		for(int i = 0; i< p.neighbors.length; i++){
+			if(p.neighbors[i].distance < threshold)
+				arr.add(p.neighbors[i].p);
+		}
+		return arr;
 	}
 	private class PointDensity implements Comparable<PointDensity>{
 		private double density = 0;
