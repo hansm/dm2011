@@ -3,6 +3,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.ArrayList;
 
+import net.sf.javaml.core.kdtree.KDTree;
+
 /**
  * Shared Nearest Neighbor (SNN) implementation.
  */
@@ -17,6 +19,8 @@ public class SNN implements ClusteringAlgorithm {
 	private int linkThreshold;
 
 	private ArrayList<DataPoint> points;
+	
+	private KDTree kdtree;
 
 	/**
 	 * SNN clustering
@@ -56,12 +60,17 @@ public class SNN implements ClusteringAlgorithm {
 			throw new AlgorithmException(
 					"You need at least K + 1 points to cluster.");
 		}
+		
+		// add points to KD-tree to find neighbors of all points
+		kdtree = new KDTree(2);
+		for (int i = 0; i < points.size(); i++) {
+			double[] key = {points.get(i).getX(), points.get(i).getY()};
+			kdtree.insert(key, i);
+		}
 
-		double[][] matrix = computeSimilarityMatrix();
+		int[][] nearestNeighbors = getKNearest();
 
-		matrix = getKNearest(matrix);
-
-		int[][] similarityMatrix = createSNNMatrix(matrix);
+		int[][] similarityMatrix = createSNNMatrix(nearestNeighbors);
 
 		findCoreAndNoise(similarityMatrix);
 
@@ -71,49 +80,27 @@ public class SNN implements ClusteringAlgorithm {
 	}
 
 	/**
-	 * Compute similarity matrix
+	 * Get K-nearest points for each
 	 * 
-	 * @return
-	 */
-	private double[][] computeSimilarityMatrix() {
-		double[][] matrix = new double[points.size()][points.size()];
-		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix.length; j++) {
-				if (i == j) {
-					matrix[i][j] = 0;
-				} else {
-					matrix[i][j] = points.get(i).calcDistance(points.get(j));
-				}
-			}
-		}
-		return matrix;
-	}
-
-	/**
-	 * Sparsify the similarity matrix by keeping only the k most similar
-	 * neighbors
-	 * 
-	 * @param matrix
-	 *            similarity matrix
 	 * @return matrix with only K nearest
 	 */
-	private double[][] getKNearest(double[][] matrix) {
-		double[] rowCopy;
-		double kVal;
-		for (int i = 0; i < matrix.length; i++) {
-			// find K-th nearest point
-			rowCopy = matrix[i].clone();
-			Arrays.sort(rowCopy);
-			kVal = rowCopy[K];
+	private int[][] getKNearest() {
+		int[][] kNearest = new int[points.size()][K];
+		double[] key = new double[2];
+		Object[] nearest;
+		for (int i  = 0; i < points.size(); i++) {
+			key[0] = points.get(i).getX();
+			key[1] = points.get(i).getY();
 
-			// remove all other connections
-			for (int j = 0; j < matrix[i].length; j++) {
-				if (matrix[i][j] > kVal) {
-					matrix[i][j] = 0;
-				}
+			// get K + 1 nearest, first is this point
+			nearest = kdtree.nearest(key, K + 1);
+			
+			for (int j = 1; j <= K; j++) {
+				kNearest[i][j - 1] = (Integer) nearest[j];
 			}
+			Arrays.sort(kNearest[i]);
 		}
-		return matrix;
+		return kNearest;
 	}
 
 	/**
@@ -124,8 +111,8 @@ public class SNN implements ClusteringAlgorithm {
 	 *            K-closest matrix
 	 * @return
 	 */
-	private int[][] createSNNMatrix(double[][] matrix) {
-		int[][] m = new int[matrix.length][matrix.length];
+	private int[][] createSNNMatrix(int[][] nearestNeighbors) {
+		int[][] m = new int[points.size()][points.size()];
 
 		for (int i = 0; i < m.length; i++) {
 			for (int j = 0; j < m.length; j++) {
@@ -133,18 +120,23 @@ public class SNN implements ClusteringAlgorithm {
 			}
 		}
 
+		int similarity;
 		for (int i = 0; i < m.length; i++) {
-			for (int j = i + 1; j < m.length; j++) {
-				if (matrix[i][j] == 0 || matrix[j][i] == 0) {
+			for (int j : nearestNeighbors[i]) {
+				// no need to compare j & i if already compared i & j, j neighbors must contain i
+				if (j <= i || Arrays.binarySearch(nearestNeighbors[j], i) < 0) {
 					continue;
 				}
 
-				for (int k = 0; k < m.length; k++) {
-					if (matrix[i][k] > 0 && matrix[j][k] > 0) {
-						m[i][j]++;
-						m[j][i]++;
+				similarity = 0;
+				for (int k : nearestNeighbors[i]) {
+					if (Arrays.binarySearch(nearestNeighbors[j], k) >= 0) {
+						similarity++;
 					}
 				}
+
+				m[i][j] = similarity;
+				m[j][i] = similarity;
 			}
 		}
 
