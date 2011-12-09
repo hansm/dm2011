@@ -46,6 +46,9 @@ public class dbc extends Canvas
 	
 	
 	public static int dotSize = 8;
+	private static JSpinner dbscanEps;
+	private static JSpinner dbscanMinpts;
+	private static JSpinner dcborEps;
 	private static JSpinner snnK;
 	private static JSpinner snnCore;
 	private static JSpinner snnNoise;
@@ -60,7 +63,7 @@ public class dbc extends Canvas
     // ArrayList<P> points
     public static void clustering1() {
     	kontroll.setText("DBSCAN algorithm: running");
-    	ClusteringAlgorithm dbscan = new DBSCAN(points, 5, 10.0);
+    	ClusteringAlgorithm dbscan = new DBSCAN(points, (Integer) dbscanMinpts.getValue(), (Double) dbscanEps.getValue());
     	try {
 			int clusters = dbscan.run();
 		} catch (AlgorithmException e) {
@@ -143,9 +146,9 @@ public class dbc extends Canvas
     	colors[0] = Color.gray;
     	int[] c = {255, 192, 160, 128};
     	for (int i = 0; i < c.length; i++) {
-    		colors[(1 + 6*i)] = new Color(0, 0, c[i]);
+    		colors[(1 + 6*i)] = new Color(c[i], 0, 0);
     		colors[(2 + 6*i)] = new Color(0, c[i], 0);
-    		colors[(3 + 6*i)] = new Color(c[i], 0, 0);
+    		colors[(3 + 6*i)] = new Color(0, 0, c[i]);
     		colors[(4 + 6*i)] = new Color(0, c[i], c[i]);
     		colors[(5 + 6*i)] = new Color(c[i], 0, c[i]);
     		colors[(6 + 6*i)] = new Color(c[i], c[i], 0);
@@ -292,50 +295,76 @@ public class dbc extends Canvas
         JButton btnClustering2 = new JButton("Clustering 2");
         btnClustering2.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
         btnClustering2.setHorizontalAlignment(SwingConstants.LEFT);
-        btnClustering2.setBounds(12, 79, 305, 23);
+        btnClustering2.setBounds(10, 126, 305, 23);
         panelCluster.add(btnClustering2);
         
         JButton btnClustering3 = new JButton("SNN");
         btnClustering3.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
         btnClustering3.setHorizontalAlignment(SwingConstants.LEFT);
-        btnClustering3.setBounds(12, 113, 305, 23);
+        btnClustering3.setBounds(12, 191, 305, 23);
         panelCluster.add(btnClustering3);
         
         snnK = new JSpinner();
         snnK.setModel(new SpinnerNumberModel(new Integer(5), new Integer(0), null, new Integer(1)));
-        snnK.setBounds(101, 141, 42, 20);
+        snnK.setBounds(101, 219, 42, 20);
         panelCluster.add(snnK);
         
         JLabel lblsnnK = new JLabel("K:");
-        lblsnnK.setBounds(12, 145, 81, 14);
+        lblsnnK.setBounds(12, 223, 81, 14);
         panelCluster.add(lblsnnK);
         
         JLabel lblsnnCore = new JLabel("Core threshold:");
-        lblsnnCore.setBounds(10, 170, 81, 14);
+        lblsnnCore.setBounds(10, 248, 81, 14);
         panelCluster.add(lblsnnCore);
         
         snnCore = new JSpinner();
         snnCore.setModel(new SpinnerNumberModel(new Integer(3), new Integer(0), null, new Integer(1)));
-        snnCore.setBounds(101, 167, 42, 20);
+        snnCore.setBounds(101, 245, 42, 20);
         panelCluster.add(snnCore);
         
         JLabel lblsnnNoise = new JLabel("Noise threshold:");
-        lblsnnNoise.setBounds(184, 145, 81, 14);
+        lblsnnNoise.setBounds(184, 223, 81, 14);
         panelCluster.add(lblsnnNoise);
         
         JLabel lblsnnLink = new JLabel("Link threshold:");
-        lblsnnLink.setBounds(184, 170, 81, 14);
+        lblsnnLink.setBounds(184, 248, 81, 14);
         panelCluster.add(lblsnnLink);
         
         snnNoise = new JSpinner();
         snnNoise.setModel(new SpinnerNumberModel(new Integer(3), new Integer(0), null, new Integer(1)));
-        snnNoise.setBounds(275, 141, 42, 20);
+        snnNoise.setBounds(275, 219, 42, 20);
         panelCluster.add(snnNoise);
         
         snnLink = new JSpinner();
         snnLink.setModel(new SpinnerNumberModel(new Integer(3), new Integer(0), null, new Integer(1)));
-        snnLink.setBounds(275, 167, 42, 20);
+        snnLink.setBounds(275, 245, 42, 20);
         panelCluster.add(snnLink);
+        
+        JLabel lbldbscanEps = new JLabel("Eps:");
+        lbldbscanEps.setBounds(10, 79, 81, 14);
+        panelCluster.add(lbldbscanEps);
+        
+        JLabel lbldbscanMinpts = new JLabel("minPts:");
+        lbldbscanMinpts.setBounds(184, 79, 81, 14);
+        panelCluster.add(lbldbscanMinpts);
+        
+        dbscanEps = new JSpinner();
+        dbscanEps.setModel(new SpinnerNumberModel(new Double(10), new Double(0), null, new Double(1)));
+        dbscanEps.setBounds(84, 75, 59, 20);
+        panelCluster.add(dbscanEps);
+        
+        dbscanMinpts = new JSpinner();
+        dbscanMinpts.setModel(new SpinnerNumberModel(new Integer(5), new Integer(0), null, new Integer(1)));
+        dbscanMinpts.setBounds(275, 75, 42, 20);
+        panelCluster.add(dbscanMinpts);
+        
+        JLabel lbldcborEps = new JLabel("Eps:");
+        lbldcborEps.setBounds(10, 164, 81, 14);
+        panelCluster.add(lbldcborEps);
+        
+        dcborEps = new JSpinner();
+        dcborEps.setBounds(84, 160, 59, 20);
+        panelCluster.add(dcborEps);
         
         JLabel lblAuthors = new JLabel("Authors: Martin Loginov, Hans M\u00E4esalu, Sven Aller");
         lblAuthors.setHorizontalAlignment(SwingConstants.RIGHT);
