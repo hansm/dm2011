@@ -17,6 +17,8 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.border.BevelBorder;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 
 public class dbc extends Canvas
 {
@@ -143,12 +145,6 @@ public class dbc extends Canvas
     	lblElements.setText(Integer.toString(points.size()));
 //    	kontroll.setText((p.x / 50) + " " + (4 * p.y / 125) + " = " + (int)(Math.floor(p.x / 125) + 4 * Math.floor(p.y / 125)));
     }
-    
-    public static void klassifitseeri() {
-    	for (DataPoint point : points) {
-    		point.cluster = (int)(Math.floor(point.x / 125) + 4 * Math.floor(point.y / 125));
-    	}
-    }
    
     public static void createColors() {
     	colors[0] = Color.gray;
@@ -186,9 +182,6 @@ public class dbc extends Canvas
     		break;
     	case 3:
     		clustering3();
-    		break;
-    	case 4:
-    		klassifitseeri();
     		break;
     	}
     	countClusters();
@@ -289,6 +282,15 @@ public class dbc extends Canvas
         btnClear.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-delete.gif")));
         
         chkAirbrush = new Checkbox("Airbrush");
+        chkAirbrush.addItemListener(new ItemListener() {
+        	public void itemStateChanged(ItemEvent arg0) {
+        		if (chkAirbrush.getState()) {
+        			sliderAirbrush.setEnabled(true);
+        		} else {
+        			sliderAirbrush.setEnabled(false);
+        		}
+        	}
+        });
         chkAirbrush.setBounds(10, 10, 77, 22);
         panelInput.add(chkAirbrush);
         
@@ -332,6 +334,7 @@ public class dbc extends Canvas
         panelInput.add(btnSaveFile);
         
         sliderAirbrush = new JSlider();
+        sliderAirbrush.setEnabled(false);
         sliderAirbrush.addMouseMotionListener(new MouseMotionAdapter() {
         	@Override
         	public void mouseDragged(MouseEvent arg0) {
@@ -398,12 +401,6 @@ public class dbc extends Canvas
         listClusters.setMultipleSelections(false);
         frmDensitybasedClustering.getContentPane().add(listClusters);
         
-        JButton btnTestClustering = new JButton("ClusterTest");
-        btnTestClustering.setBounds(5, 0, 307, 23);
-        frmDensitybasedClustering.getContentPane().add(btnTestClustering);
-        btnTestClustering.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
-        btnTestClustering.setHorizontalAlignment(SwingConstants.LEFT);
-        
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         tabbedPane.setBounds(15, 250, 327, 293);
         frmDensitybasedClustering.getContentPane().add(tabbedPane);
@@ -461,7 +458,7 @@ public class dbc extends Canvas
         panelDcbor.add(dcborEps);
         
         dcborFreqtable = new TextArea("", 0, 0, dcborFreqtable.SCROLLBARS_VERTICAL_ONLY);
-        dcborFreqtable.setBounds(154, 69, 163, 185);
+        dcborFreqtable.setBounds(10, 69, 307, 185);
         panelDcbor.add(dcborFreqtable);
         
         panelSnn = new JPanel();
@@ -519,12 +516,6 @@ public class dbc extends Canvas
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
         		clustering(2);
-        	}
-        });
-        btnTestClustering.addMouseListener(new MouseAdapter() {
-        	@Override
-        	public void mouseClicked(MouseEvent arg0) {
-        		clustering(4);
         	}
         });
         btnOpenFile.addMouseListener(new MouseAdapter() {
