@@ -212,11 +212,9 @@ public class SNN implements ClusteringAlgorithm {
 
 			// BFS to connect core points into clusters
 			queue.add(i);
+			points.get(i).setCluster(cluster);
 			while (!queue.isEmpty()) {
 				j = (int) queue.poll();
-				
-				// set cluster
-				points.get(j).setCluster(cluster);
 				
 				for (Edge edge : SNNGraph.getVertexEdges(j)) {
 					if (edge == null) {
@@ -224,6 +222,7 @@ public class SNN implements ClusteringAlgorithm {
 					}
 					k = edge.getTarget();
 					if (points.get(k).getCluster() == -1 && points.get(k).isCore()) {
+						points.get(k).setCluster(cluster);
 						queue.add(k);
 					}
 				}
