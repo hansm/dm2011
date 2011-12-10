@@ -28,6 +28,30 @@ public class DCBOR implements ClusteringAlgorithm {
 		}
 	}
 	
+	private void displayDensityHistogram(){
+		double[][] ranges = new double[20][2];
+		int[] count = new int[20];
+		ranges[0][0] = 0.0;
+		ranges[0][1] = 0.05;
+		double cratio = 0.0;
+		
+		for(int i = 1; i<ranges.length; i++){
+			ranges[i][0] = ranges[i-1][1]+0.01;
+			ranges[i][1] = ranges[i-1][1]+0.05;
+		}
+		
+		for(int i = 0; i< dpoints.length;i++){
+			cratio = dpoints[i].density / dpoints[dpoints.length-1].density;
+			for(int j = 0; j< ranges.length; j++){
+				if(cratio >= ranges[j][0] && cratio <= ranges[j][1])
+					count[j]++;
+			}
+		}
+		
+		for(int i=0;i<ranges.length;i++)
+			System.out.printf("%.2f - %.2f: %d points\n", ranges[i][0], ranges[i][1], count[i]);
+	}
+	
 	private void createDensityList(){
 		dpoints = new PointDensity[points.size()];
 		for(int i = 0; i < points.size(); i++)
@@ -42,6 +66,7 @@ public class DCBOR implements ClusteringAlgorithm {
 		}
 		
 		java.util.Arrays.sort(dpoints);
+		displayDensityHistogram();
 	}
 
 	@Override
