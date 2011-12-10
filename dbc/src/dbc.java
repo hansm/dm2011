@@ -326,7 +326,7 @@ public class dbc extends Canvas
         panelCluster.add(lblsnnCore);
         
         snnCore = new JSpinner();
-        snnCore.setModel(new SpinnerNumberModel(new Integer(3), new Integer(0), null, new Integer(1)));
+        snnCore.setModel(new SpinnerNumberModel(new Integer(5), new Integer(0), null, new Integer(1)));
         snnCore.setBounds(101, 245, 42, 20);
         panelCluster.add(snnCore);
         
@@ -344,7 +344,7 @@ public class dbc extends Canvas
         panelCluster.add(snnNoise);
         
         snnLink = new JSpinner();
-        snnLink.setModel(new SpinnerNumberModel(new Integer(3), new Integer(0), null, new Integer(1)));
+        snnLink.setModel(new SpinnerNumberModel(new Integer(2), new Integer(0), null, new Integer(1)));
         snnLink.setBounds(275, 245, 42, 20);
         panelCluster.add(snnLink);
         

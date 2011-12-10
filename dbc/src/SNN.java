@@ -1,3 +1,5 @@
+import graph.*;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -21,6 +23,8 @@ public class SNN implements ClusteringAlgorithm {
 	private ArrayList<DataPoint> points;
 	
 	private KDTree kdtree;
+	
+	private UndirectedGraph SNNGraph;
 
 	/**
 	 * SNN clustering
@@ -70,13 +74,13 @@ public class SNN implements ClusteringAlgorithm {
 
 		int[][] nearestNeighbors = getKNearest();
 
-		int[][] similarityMatrix = createSNNMatrix(nearestNeighbors);
+		createSNNGraph(nearestNeighbors);
 
-		findCoreAndNoise(similarityMatrix);
+		findCoreAndNoise();
 
-		removeUnimportantLinks(similarityMatrix);
+		removeUnimportantLinks();
 
-		return formClusters(similarityMatrix);
+		return formClusters();
 	}
 
 	/**
@@ -111,36 +115,26 @@ public class SNN implements ClusteringAlgorithm {
 	 *            K-closest matrix
 	 * @return
 	 */
-	private int[][] createSNNMatrix(int[][] nearestNeighbors) {
-		int[][] m = new int[points.size()][points.size()];
-
-		for (int i = 0; i < m.length; i++) {
-			for (int j = 0; j < m.length; j++) {
-				m[i][j] = 0;
-			}
-		}
-
-		int similarity;
-		for (int i = 0; i < m.length; i++) {
+	private void createSNNGraph(int[][] nearestNeighbors) {
+		SNNGraph = new UndirectedGraph(points.size());
+		int strength;
+		for (int i = 0; i < points.size(); i++) {
 			for (int j : nearestNeighbors[i]) {
 				// no need to compare j & i if already compared i & j, j neighbors must contain i
 				if (j <= i || Arrays.binarySearch(nearestNeighbors[j], i) < 0) {
 					continue;
 				}
 
-				similarity = 0;
+				strength = 0;
 				for (int k : nearestNeighbors[i]) {
 					if (Arrays.binarySearch(nearestNeighbors[j], k) >= 0) {
-						similarity++;
+						strength++;
 					}
 				}
-
-				m[i][j] = similarity;
-				m[j][i] = similarity;
+				SNNGraph.addEdge(i, j, strength);
 			}
 		}
-
-		return m;
+		return;
 	}
 
 	/**
@@ -150,12 +144,12 @@ public class SNN implements ClusteringAlgorithm {
 	 * @param matrix
 	 * @return
 	 */
-	private int[] calcLinksTotal(int[][] matrix) {
-		int[] links = new int[matrix.length];
+	private int[] calcLinksTotal() {
+		int[] links = new int[points.size()];
 		for (int i = 0; i < links.length; i++) {
 			links[i] = 0;
-			for (int j = 0; j < links.length; j++) {
-				links[i] += matrix[i][j];
+			for (Edge edge : SNNGraph.getVertexEdges(i)) {
+				links[i] += edge.getStrength();
 			}
 		}
 		return links;
@@ -168,8 +162,8 @@ public class SNN implements ClusteringAlgorithm {
 	 * 
 	 * @param similarityMatrix
 	 */
-	private void findCoreAndNoise(int[][] similarityMatrix) {
-		int[] linksTotal = calcLinksTotal(similarityMatrix);
+	private void findCoreAndNoise() {
+		int[] linksTotal = calcLinksTotal();
 		for (int i = 0; i < linksTotal.length; i++) {
 			// check if is core
 			points.get(i).setCore(linksTotal[i] >= coreThreshold);
@@ -177,21 +171,23 @@ public class SNN implements ClusteringAlgorithm {
 			// check if is noise
 			points.get(i).setCluster(linksTotal[i] < noiseThreshold ? 0 : -1);
 		}
+		return;
 	}
 
 	/**
 	 * Remove all links between points that have weight smaller than a threshold
-	 * 
-	 * @param similarityMatrix
 	 */
-	private void removeUnimportantLinks(int[][] similarityMatrix) {
-		for (int i = 0; i < similarityMatrix.length; i++) {
-			for (int j = 0; j < similarityMatrix.length; j++) {
-				if (similarityMatrix[i][j] < linkThreshold) {
-					similarityMatrix[i][j] = 0;
+	private void removeUnimportantLinks() {
+		ArrayList<Edge> edges;
+		for (int i = 0; i < points.size(); i++) {
+			edges = SNNGraph.getVertexEdges(i);
+			for (int j = 0; j < edges.size(); j++) {
+				if (edges.get(j).getStrength() < linkThreshold)  {
+					edges.set(j, null);
 				}
 			}
 		}
+		return;
 	}
 
 	/**
@@ -201,9 +197,9 @@ public class SNN implements ClusteringAlgorithm {
 	 * 
 	 * @param similarityMatrix
 	 */
-	private int formClusters(int[][] similarityMatrix) {
+	private int formClusters() {
 		int cluster = 0;
-		int j;
+		int j, k;
 		Queue<Integer> queue = new LinkedList<Integer>();
 
 		for (int i = 0; i < points.size(); i++) {
@@ -221,31 +217,38 @@ public class SNN implements ClusteringAlgorithm {
 				
 				// set cluster
 				points.get(j).setCluster(cluster);
-
-				for (int k = 0; k < points.size(); k++) {
-					if (similarityMatrix[j][k] > 0
-							&& points.get(k).getCluster() == -1
-							&& points.get(k).isCore()) {
+				
+				for (Edge edge : SNNGraph.getVertexEdges(j)) {
+					if (edge == null) {
+						continue;
+					}
+					k = edge.getTarget();
+					if (points.get(k).getCluster() == -1 && points.get(k).isCore()) {
 						queue.add(k);
 					}
 				}
 			}
 		}
-
+		
 		// connect all border points to nearest core point
 		DataPoint connectTo;
-		int connectToSimilarity;
+		int connectToStrength;
 		for (int i = 0; i < points.size(); i++) {
-			if (points.get(i).getCluster() == -1 && !points.get(i).isCore()) {
+			if (points.get(i).getCluster() == -1) {
 				connectTo = null;
-				connectToSimilarity = 0;
-				for (j = 0; j < points.size(); j++) {
-					if (similarityMatrix[i][j] > 0 && points.get(j).isCore() && (connectTo == null || connectToSimilarity < similarityMatrix[i][j])) {
+				connectToStrength = 0;
+				
+				for (Edge edge : SNNGraph.getVertexEdges(i)) {
+					if (edge == null) {
+						continue;
+					}
+					j = edge.getTarget();
+					if (points.get(j).isCore() && (connectTo == null || connectToStrength < edge.getStrength())) {
 						connectTo = points.get(j);
-						connectToSimilarity = similarityMatrix[i][j];
+						connectToStrength = edge.getStrength();
 					}
 				}
-				
+
 				points.get(i).setCluster(connectTo == null ? 0 : connectTo.getCluster());
 			}
 		}
