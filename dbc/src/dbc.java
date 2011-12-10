@@ -75,7 +75,7 @@ public class dbc extends Canvas
     
     public static void clustering2() {
     	kontroll.setText("DCBOR algorithm: running");
-    	ClusteringAlgorithm dcbor = new DCBOR(points, 1.0);
+    	ClusteringAlgorithm dcbor = new DCBOR(points, (Double) dcborEps.getValue());
     	try {
 			int clusters = dcbor.run();
 		} catch (AlgorithmException e) {
@@ -370,7 +370,7 @@ public class dbc extends Canvas
         lbldcborEps.setBounds(10, 164, 81, 14);
         panelCluster.add(lbldcborEps);
         
-        dcborEps = new JSpinner();
+        dcborEps = new JSpinner(new SpinnerNumberModel(0.5, 0.0, 1.0, 0.01));
         dcborEps.setBounds(84, 160, 59, 20);
         panelCluster.add(dcborEps);
         
