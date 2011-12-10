@@ -5,8 +5,10 @@ import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,14 +16,16 @@ import java.util.HashSet;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.border.BevelBorder;
+import java.awt.event.MouseMotionAdapter;
 
 public class dbc extends Canvas
 {
-	private static JTextField kontroll;
 	
 	public final static dbc canvas = new dbc();
+	private static JPanel panelDcbor;
+	private static JPanel panelSnn;
 	
-	private static JTextField txtFilename;
+	private static Checkbox chkAirbrush;
 	private static JLabel lblElements;
 	private static JLabel lblClusters;
 	private static List listClusters;
@@ -45,6 +49,9 @@ public class dbc extends Canvas
 	private static JSpinner snnLink;
 	
 	public static String freqtable = "";
+
+	private static JSlider sliderAirbrush;
+	private static Label lblAirbrushsize; 
 	
     public dbc()
     {
@@ -54,7 +61,7 @@ public class dbc extends Canvas
     // Type P: x, y, cluster (default -1)
     // ArrayList<P> points
     public static void clustering1() {
-    	kontroll.setText("DBSCAN algorithm: running");
+//    	kontroll.setText("DBSCAN algorithm: running");
     	ClusteringAlgorithm dbscan = new DBSCAN(points, (Integer) dbscanMinpts.getValue(), (Double) dbscanEps.getValue());
     	try {
 			int clusters = dbscan.run();
@@ -62,11 +69,11 @@ public class dbc extends Canvas
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	kontroll.setText("DBSCAN algorithm: finished");
+//    	kontroll.setText("DBSCAN algorithm: finished");
     }
     
     public static void clustering2() {
-    	kontroll.setText("DCBOR algorithm: running");
+//    	kontroll.setText("DCBOR algorithm: running");
     	ClusteringAlgorithm dcbor = new DCBOR(points, (Double) dcborEps.getValue());
     	try {
 			int clusters = dcbor.run();
@@ -75,18 +82,18 @@ public class dbc extends Canvas
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	kontroll.setText("DCBOR algorithm: finished");
+//    	kontroll.setText("DCBOR algorithm: finished");
     }
     
     public static void clustering3() {
-    	kontroll.setText("SNN algorithm: running");
+//    	kontroll.setText("SNN algorithm: running");
     	ClusteringAlgorithm algorithm = new SNN(points, (Integer) snnK.getValue(), (Integer) snnCore.getValue(), (Integer) snnNoise.getValue(), (Integer) snnLink.getValue());
     	try {
     		int clusters = algorithm.run();
-    		kontroll.setText("SNN algorithm: finished");
+//    		kontroll.setText("SNN algorithm: finished");
     	} catch (Exception e) {
     		System.out.println(e.getMessage());
-    		kontroll.setText(e.getMessage());
+//    		kontroll.setText(e.getMessage());
     	}
     }
     
@@ -231,16 +238,25 @@ public class dbc extends Canvas
 		}
 
     	createColors();
+        canvas.setBounds(367, 43, 500, 500);
     	
         canvas.setBackground(Color.WHITE);
         canvas.addMouseListener(new MouseAdapter() {
         	public void mouseClicked(MouseEvent e) {
-    			addPoint(e.getPoint());
+        		if (chkAirbrush.getState()) {
+        			for (int i = 0; i < sliderAirbrush.getValue(); i++) {
+        				Point tmp = e.getPoint();
+        				tmp.x = tmp.x + (int)(Math.random()*6*sliderAirbrush.getValue()-3*sliderAirbrush.getValue());
+        				tmp.y = tmp.y + (int)(Math.random()*6*sliderAirbrush.getValue()-3*sliderAirbrush.getValue());
+        				if (tmp.x > 0 && tmp.x < 500 && tmp.y > 0 && tmp.y < 500) addPoint(tmp);
+        			}
+        		} else {
+        			addPoint(e.getPoint());
+        		}
     			canvas.repaint();
         	}
         	
         });
-        canvas.setBounds(367, 43, 500, 500);
         JFrame frmDensitybasedClustering = new JFrame();
         frmDensitybasedClustering.setIconImage(Toolkit.getDefaultToolkit().getImage(dbc.class.getResource("/images/icon-logo.gif")));
         frmDensitybasedClustering.setTitle("Density-based clustering");
@@ -250,131 +266,104 @@ public class dbc extends Canvas
         frmDensitybasedClustering.getContentPane().setLayout(null);
         frmDensitybasedClustering.getContentPane().add(canvas);
         
-        kontroll = new JTextField();
-        kontroll.setBounds(5, 555, 246, 20);
-        frmDensitybasedClustering.getContentPane().add(kontroll);
-        kontroll.setColumns(10);
-        
         JPanel panelCanvas = new JPanel();
-        panelCanvas.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
         panelCanvas.setBounds(362, 38, 510, 510);
+        panelCanvas.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
         frmDensitybasedClustering.getContentPane().add(panelCanvas);
         panelCanvas.setLayout(null);
         
         JPanel panelInput = new JPanel();
+        panelInput.setBounds(15, 163, 327, 76);
         panelInput.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-        panelInput.setBounds(15, 178, 327, 44);
         frmDensitybasedClustering.getContentPane().add(panelInput);
         panelInput.setLayout(null);
         
-        txtFilename = new JTextField();
-        txtFilename.setBounds(10, 11, 265, 20);
-        panelInput.add(txtFilename);
-        txtFilename.setColumns(10);
-        
-        JButton btnOpenFile = new JButton("");
+        JButton btnOpenFile = new JButton("Open");
         btnOpenFile.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-open.gif")));
-        btnOpenFile.setBounds(285, 8, 32, 23);
+        btnOpenFile.setBounds(114, 41, 91, 23);
         panelInput.add(btnOpenFile);
         
-        JPanel panelCluster = new JPanel();
-        panelCluster.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-        panelCluster.setBounds(15, 233, 327, 276);
-        frmDensitybasedClustering.getContentPane().add(panelCluster);
-        panelCluster.setLayout(null);
+        JButton btnClear = new JButton("Clear");
+        btnClear.setBounds(215, 41, 91, 23);
+        panelInput.add(btnClear);
+        btnClear.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-delete.gif")));
         
-        JButton btnClustering1 = new JButton("DBSCAN");
-        btnClustering1.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
-        btnClustering1.setHorizontalAlignment(SwingConstants.LEFT);
-        btnClustering1.setBounds(10, 11, 307, 23);
-        panelCluster.add(btnClustering1);
+        chkAirbrush = new Checkbox("Airbrush");
+        chkAirbrush.setBounds(10, 10, 77, 22);
+        panelInput.add(chkAirbrush);
         
-        JButton btnClustering2 = new JButton("DCBOR");
-        btnClustering2.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
-        btnClustering2.setHorizontalAlignment(SwingConstants.LEFT);
-        btnClustering2.setBounds(12, 72, 305, 23);
-        panelCluster.add(btnClustering2);
+        JButton btnSaveFile = new JButton("Save");
+        btnSaveFile.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-save.gif")));
+        btnSaveFile.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent arg0) {
+        		try {
+        			JFileChooser fileChooser = new JFileChooser("");
+        			if (currentDir != null) {
+        				fileChooser.setCurrentDirectory(currentDir);
+        			}
+        			FileFilter filter = new FileNameExtensionFilter("CSV Files", "csv");
+        			fileChooser.addChoosableFileFilter(filter);
+        	        int returnVal = fileChooser.showSaveDialog(null);
+        	        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        	        	File file = fileChooser.getSelectedFile();
+        	        	int result = JOptionPane.YES_OPTION;
+//        	        	kontroll.setText(file.getAbsoluteFile() + ".csv");
+        	        	if (new File(file.getAbsoluteFile() + ".csv").exists()) {
+        	        		result = JOptionPane.NO_OPTION;
+        	        		result = JOptionPane.showConfirmDialog(canvas,"The file exists! Overwrite?","Existing file",JOptionPane.YES_NO_CANCEL_OPTION); 
+        	        	} 
+        	        	if (result == JOptionPane.YES_OPTION) {
+	        	        	currentDir = file.getAbsoluteFile();
+		        			BufferedWriter out = new BufferedWriter(new FileWriter(file + ".csv"));
+		        			for (DataPoint dp : points) {
+		        				out.write(dp.x + "," + dp.y + "\n");
+		        			}
+		        		    out.close();
+	        		    }
+        	        }
+				} 
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+        	}
+        });
+        btnSaveFile.setBounds(10, 41, 91, 23);
+        panelInput.add(btnSaveFile);
         
-        JButton btnClustering3 = new JButton("SNN");
-        btnClustering3.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
-        btnClustering3.setHorizontalAlignment(SwingConstants.LEFT);
-        btnClustering3.setBounds(12, 191, 305, 23);
-        panelCluster.add(btnClustering3);
+        sliderAirbrush = new JSlider();
+        sliderAirbrush.addMouseMotionListener(new MouseMotionAdapter() {
+        	@Override
+        	public void mouseDragged(MouseEvent arg0) {
+        		lblAirbrushsize.setText("Size: " + Integer.toString(sliderAirbrush.getValue()));
+        	}
+        });
         
-        snnK = new JSpinner();
-        snnK.setModel(new SpinnerNumberModel(new Integer(5), new Integer(0), null, new Integer(1)));
-        snnK.setBounds(101, 219, 42, 20);
-        panelCluster.add(snnK);
         
-        JLabel lblsnnK = new JLabel("K:");
-        lblsnnK.setBounds(12, 223, 81, 14);
-        panelCluster.add(lblsnnK);
+        sliderAirbrush.setValue(5);
+        sliderAirbrush.setMinimum(2);
+        sliderAirbrush.setMaximum(8);
+        sliderAirbrush.setBounds(157, 10, 160, 24);
+        panelInput.add(sliderAirbrush);
         
-        JLabel lblsnnCore = new JLabel("Core threshold:");
-        lblsnnCore.setBounds(10, 248, 81, 14);
-        panelCluster.add(lblsnnCore);
-        
-        snnCore = new JSpinner();
-        snnCore.setModel(new SpinnerNumberModel(new Integer(5), new Integer(0), null, new Integer(1)));
-        snnCore.setBounds(101, 245, 42, 20);
-        panelCluster.add(snnCore);
-        
-        JLabel lblsnnNoise = new JLabel("Noise threshold:");
-        lblsnnNoise.setBounds(184, 223, 81, 14);
-        panelCluster.add(lblsnnNoise);
-        
-        JLabel lblsnnLink = new JLabel("Link threshold:");
-        lblsnnLink.setBounds(184, 248, 81, 14);
-        panelCluster.add(lblsnnLink);
-        
-        snnNoise = new JSpinner();
-        snnNoise.setModel(new SpinnerNumberModel(new Integer(3), new Integer(0), null, new Integer(1)));
-        snnNoise.setBounds(275, 219, 42, 20);
-        panelCluster.add(snnNoise);
-        
-        snnLink = new JSpinner();
-        snnLink.setModel(new SpinnerNumberModel(new Integer(2), new Integer(0), null, new Integer(1)));
-        snnLink.setBounds(275, 245, 42, 20);
-        panelCluster.add(snnLink);
-        
-        JLabel lbldbscanEps = new JLabel("Eps:");
-        lbldbscanEps.setBounds(10, 45, 81, 14);
-        panelCluster.add(lbldbscanEps);
-        
-        JLabel lbldbscanMinpts = new JLabel("minPts:");
-        lbldbscanMinpts.setBounds(184, 45, 81, 14);
-        panelCluster.add(lbldbscanMinpts);
-        
-        dbscanEps = new JSpinner();
-        dbscanEps.setModel(new SpinnerNumberModel(new Double(10), new Double(0), null, new Double(1)));
-        dbscanEps.setBounds(84, 41, 59, 20);
-        panelCluster.add(dbscanEps);
-        
-        dbscanMinpts = new JSpinner();
-        dbscanMinpts.setModel(new SpinnerNumberModel(new Integer(5), new Integer(0), null, new Integer(1)));
-        dbscanMinpts.setBounds(275, 41, 42, 20);
-        panelCluster.add(dbscanMinpts);
-        
-        JLabel lbldcborEps = new JLabel("Eps:");
-        lbldcborEps.setBounds(12, 110, 81, 14);
-        panelCluster.add(lbldcborEps);
-        
-        dcborEps = new JSpinner(new SpinnerNumberModel(0.5, 0.0, 1.0, 0.01));
-        dcborEps.setBounds(86, 106, 59, 20);
-        panelCluster.add(dcborEps);
-        
-        dcborFreqtable = new TextArea("", 0, 0, dcborFreqtable.SCROLLBARS_VERTICAL_ONLY);
-        dcborFreqtable.setBounds(153, 101, 164, 84);
-        panelCluster.add(dcborFreqtable);
+        lblAirbrushsize = new Label("Size: 5");
+        lblAirbrushsize.setBounds(104, 10, 47, 22);
+        panelInput.add(lblAirbrushsize);
+        btnClear.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		clearCanvas();
+        	}
+        });
         
         JLabel lblAuthors = new JLabel("Authors: Martin Loginov, Hans M\u00E4esalu, Sven Aller");
-        lblAuthors.setHorizontalAlignment(SwingConstants.RIGHT);
         lblAuthors.setBounds(621, 549, 363, 14);
+        lblAuthors.setHorizontalAlignment(SwingConstants.RIGHT);
         frmDensitybasedClustering.getContentPane().add(lblAuthors);
         
         JLabel lblHeader = new JLabel("");
+        lblHeader.setBounds(48, 0, 250, 140);
         lblHeader.setIcon(new ImageIcon(dbc.class.getResource("/images/header.gif")));
-        lblHeader.setBounds(50, 27, 250, 140);
         frmDensitybasedClustering.getContentPane().add(lblHeader);
         
         JLabel lblElementsLabel = new JLabel("Elements: ");
@@ -397,12 +386,8 @@ public class dbc extends Canvas
         lblShowLabel.setBounds(880, 93, 94, 14);
         frmDensitybasedClustering.getContentPane().add(lblShowLabel);
         
-        JButton btnClear = new JButton("Clear");
-        btnClear.setBounds(15, 520, 327, 23);
-        frmDensitybasedClustering.getContentPane().add(btnClear);
-        btnClear.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-delete.gif")));
-        
         listClusters = new List();
+        listClusters.setBounds(883, 113, 100, 430);
         listClusters.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent e) {
@@ -411,26 +396,119 @@ public class dbc extends Canvas
         });
         
         listClusters.setMultipleSelections(false);
-        listClusters.setBounds(883, 113, 100, 430);
         frmDensitybasedClustering.getContentPane().add(listClusters);
         
         JButton btnTestClustering = new JButton("ClusterTest");
-        btnTestClustering.setBounds(358, 11, 307, 23);
+        btnTestClustering.setBounds(5, 0, 307, 23);
         frmDensitybasedClustering.getContentPane().add(btnTestClustering);
         btnTestClustering.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
         btnTestClustering.setHorizontalAlignment(SwingConstants.LEFT);
-        btnTestClustering.addMouseListener(new MouseAdapter() {
+        
+        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane.setBounds(15, 250, 327, 293);
+        frmDensitybasedClustering.getContentPane().add(tabbedPane);
+        
+        JPanel panelDbscan = new JPanel();
+        tabbedPane.addTab("DBSCAN", new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")), panelDbscan, null);
+        panelDbscan.setLayout(null);
+        
+        JButton btnClustering1 = new JButton("DBSCAN");
+        btnClustering1.setBounds(10, 70, 307, 23);
+        panelDbscan.add(btnClustering1);
+        btnClustering1.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
+        
+        JLabel lbldbscanEps = new JLabel("Eps:");
+        lbldbscanEps.setBounds(10, 15, 81, 14);
+        panelDbscan.add(lbldbscanEps);
+        
+        JLabel lbldbscanMinpts = new JLabel("minPts:");
+        lbldbscanMinpts.setBounds(10, 43, 81, 14);
+        panelDbscan.add(lbldbscanMinpts);
+        
+        dbscanEps = new JSpinner();
+        dbscanEps.setBounds(83, 11, 63, 20);
+        panelDbscan.add(dbscanEps);
+        dbscanEps.setModel(new SpinnerNumberModel(new Double(10), new Double(0), null, new Double(1)));
+        
+        dbscanMinpts = new JSpinner();
+        dbscanMinpts.setBounds(83, 39, 63, 20);
+        panelDbscan.add(dbscanMinpts);
+        dbscanMinpts.setModel(new SpinnerNumberModel(new Integer(5), new Integer(0), null, new Integer(1)));
+        btnClustering1.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
-        		clustering(4);
+        		clustering(1);
         	}
         });
-        btnClear.addMouseListener(new MouseAdapter() {
-        	@Override
-        	public void mouseClicked(MouseEvent e) {
-        		clearCanvas();
-        	}
-        });
+        tabbedPane.setEnabledAt(0, true);
+        
+        panelDcbor = new JPanel();
+        tabbedPane.addTab("DCBOR", new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")), panelDcbor, null);
+        tabbedPane.setEnabledAt(1, true);
+        panelDcbor.setLayout(null);
+        
+        JButton btnClustering2 = new JButton("DCBOR");
+        btnClustering2.setBounds(10, 40, 307, 23);
+        panelDcbor.add(btnClustering2);
+        btnClustering2.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
+        
+        JLabel lbldcborEps = new JLabel("Eps:");
+        lbldcborEps.setBounds(10, 15, 81, 14);
+        panelDcbor.add(lbldcborEps);
+        
+        dcborEps = new JSpinner(new SpinnerNumberModel(0.5, 0.0, 1.0, 0.01));
+        dcborEps.setBounds(83, 11, 63, 20);
+        panelDcbor.add(dcborEps);
+        
+        dcborFreqtable = new TextArea("", 0, 0, dcborFreqtable.SCROLLBARS_VERTICAL_ONLY);
+        dcborFreqtable.setBounds(154, 69, 163, 185);
+        panelDcbor.add(dcborFreqtable);
+        
+        panelSnn = new JPanel();
+        tabbedPane.addTab("SNN", new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")), panelSnn, null);
+        tabbedPane.setEnabledAt(2, true);
+        panelSnn.setLayout(null);
+        
+        JButton btnClustering3 = new JButton("SNN");
+        btnClustering3.setBounds(10, 70, 307, 23);
+        panelSnn.add(btnClustering3);
+        btnClustering3.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
+        
+        JLabel lblsnnK = new JLabel("K:");
+        lblsnnK.setBounds(10, 15, 81, 14);
+        panelSnn.add(lblsnnK);
+        
+        JLabel lblsnnCore = new JLabel("Core threshold:");
+        lblsnnCore.setBounds(12, 43, 81, 14);
+        panelSnn.add(lblsnnCore);
+        
+        snnCore = new JSpinner();
+        snnCore.setBounds(103, 39, 42, 20);
+        panelSnn.add(snnCore);
+        snnCore.setModel(new SpinnerNumberModel(new Integer(5), new Integer(0), null, new Integer(1)));
+        
+        snnK = new JSpinner();
+        snnK.setBounds(103, 11, 42, 20);
+        panelSnn.add(snnK);
+        snnK.setModel(new SpinnerNumberModel(new Integer(5), new Integer(0), null, new Integer(1)));
+        
+        JLabel lblsnnNoise = new JLabel("Noise threshold:");
+        lblsnnNoise.setBounds(176, 15, 81, 14);
+        panelSnn.add(lblsnnNoise);
+        
+        JLabel lblsnnLink = new JLabel("Link threshold:");
+        lblsnnLink.setBounds(176, 43, 81, 14);
+        panelSnn.add(lblsnnLink);
+        
+        snnNoise = new JSpinner();
+        snnNoise.setBounds(267, 11, 42, 20);
+        panelSnn.add(snnNoise);
+        snnNoise.setModel(new SpinnerNumberModel(new Integer(3), new Integer(0), null, new Integer(1)));
+        
+        snnLink = new JSpinner();
+        snnLink.setBounds(267, 39, 42, 20);
+        panelSnn.add(snnLink);
+        snnLink.setModel(new SpinnerNumberModel(new Integer(2), new Integer(0), null, new Integer(1)));
         btnClustering3.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
@@ -443,10 +521,10 @@ public class dbc extends Canvas
         		clustering(2);
         	}
         });
-        btnClustering1.addMouseListener(new MouseAdapter() {
+        btnTestClustering.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
-        		clustering(1);
+        		clustering(4);
         	}
         });
         btnOpenFile.addMouseListener(new MouseAdapter() {
@@ -462,32 +540,43 @@ public class dbc extends Canvas
         	        int returnVal = fileChooser.showOpenDialog(null);
         	        if (returnVal == JFileChooser.APPROVE_OPTION) {
         	            File file = fileChooser.getSelectedFile();
-        	        	currentDir = file.getAbsoluteFile();
-        	            txtFilename.setText(file.getName());
-	        			clearCanvas();
-	        			BufferedReader in = new BufferedReader(new FileReader(file));
-	        			String line;
-	        			ArrayList<Point> pointsfromfile = new ArrayList<Point>();
-	        			int maxX = 0;
-	        			int maxY = 0;
-	        		    while ((line = in.readLine()) != null) {
-	        		        String[] line1 = line.split(",");
-	        		        Point newPoint = new Point(Integer.parseInt(line1[0]),Integer.parseInt(line1[1])); 
-	        		        if (newPoint.x > maxX) maxX = newPoint.x;
-	        		        if (newPoint.y > maxY) maxY = newPoint.y;
-	        		        pointsfromfile.add(newPoint);
-	        		    }
-	        		    in.close();
-	        		    double changeX = 499d / maxX;
-	        		    double changeY = 499d / maxY;
-	        		    
-	        		    for (Point p : pointsfromfile) {
-	        		    	p.x = (int)(p.x * changeX);
-	        		    	p.y = (int)(p.y * changeY);
-	        		    	points.add(new DataPoint(p));
-	        		    }
-	        		    lblElements.setText(Integer.toString(points.size()));
-	        		    canvas.repaint();
+        	            if (!file.exists()) {
+        	            	file = new File(file.getAbsoluteFile() + ".csv");
+        	            }
+        	            if (file.exists()) {
+	        	        	currentDir = file.getAbsoluteFile();
+	//        	            txtOpenFilename.setText(file.getName());
+		        			clearCanvas();
+		        			BufferedReader in = new BufferedReader(new FileReader(file));
+		        			String line;
+		        			ArrayList<Point> pointsfromfile = new ArrayList<Point>();
+		        			int maxX = 0;
+		        			int maxY = 0;
+		        		    while ((line = in.readLine()) != null) {
+		        		        String[] line1 = line.split(",");
+		        		        Point newPoint = new Point(Integer.parseInt(line1[0]),Integer.parseInt(line1[1])); 
+		        		        if (newPoint.x > maxX) maxX = newPoint.x;
+		        		        if (newPoint.y > maxY) maxY = newPoint.y;
+		        		        pointsfromfile.add(newPoint);
+		        		    }
+		        		    in.close();
+		        		    double changeX = 1;
+		        		    double changeY = 1;
+		        		    if (maxX > 500 || maxY > 500) {
+			        		    changeX = 499d / maxX;
+			        		    changeY = 499d / maxY;
+		        		    }    
+		        		    for (Point p : pointsfromfile) {
+		        		    	p.x = (int)(p.x * changeX);
+		        		    	p.y = (int)(p.y * changeY);
+		        		    	points.add(new DataPoint(p));
+		        		    }
+	
+		        		    lblElements.setText(Integer.toString(points.size()));
+		        		    canvas.repaint();
+        	            } else {
+        	            	JOptionPane.showMessageDialog(canvas,"Can't find the file!","Can't find the file",JOptionPane.OK_OPTION);
+        	            }
         	        }
 				} 
 				catch (IOException e) {
