@@ -30,10 +30,10 @@ public class DCBOR implements ClusteringAlgorithm {
 	
 	private void createDensityList(){
 		dpoints = new PointDensity[points.size()];
-		
+		for(int i = 0; i < points.size(); i++)
+			dpoints[i] = new PointDensity();
 		double[] coords = new double[2];
 		for(int i = 0; i < points.size(); i++){
-			dpoints[i] = new PointDensity();
 			coords[0] = points.get(i).getX();
 			coords[1] = points.get(i).getY();
 			
@@ -126,7 +126,6 @@ public class DCBOR implements ClusteringAlgorithm {
 				neighbors[i].p = dpoints[(Integer)neigh[i+1]];
 				density += neighbors[i].distance;
 			}
-			
 			java.util.Arrays.sort(neighbors);
 		}
 		
