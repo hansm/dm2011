@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 
+import org.omg.CORBA.FREE_MEM;
+
 import net.sf.javaml.core.kdtree.KDTree;
 
 
@@ -48,8 +50,10 @@ public class DCBOR implements ClusteringAlgorithm {
 			}
 		}
 		
-		for(int i=0;i<ranges.length;i++)
+		for(int i=0;i<ranges.length;i++) {
 			System.out.printf("%.2f - %.2f: %d points\n", ranges[i][0], ranges[i][1], count[i]);
+			dbc.freqtable = dbc.freqtable + String.format("%.2f - %.2f: %d points\n", ranges[i][0], ranges[i][1], count[i]);
+		}
 	}
 	
 	private void createDensityList(){
