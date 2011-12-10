@@ -273,11 +273,11 @@ public class dbc extends Canvas
         
         JButton btnOpenFile = new JButton("Open");
         btnOpenFile.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-open.gif")));
-        btnOpenFile.setBounds(114, 41, 91, 23);
+        btnOpenFile.setBounds(116, 41, 97, 23);
         panelInput.add(btnOpenFile);
         
         JButton btnClear = new JButton("Clear");
-        btnClear.setBounds(215, 41, 91, 23);
+        btnClear.setBounds(220, 41, 97, 23);
         panelInput.add(btnClear);
         btnClear.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-delete.gif")));
         
@@ -291,7 +291,7 @@ public class dbc extends Canvas
         		}
         	}
         });
-        chkAirbrush.setBounds(10, 10, 77, 22);
+        chkAirbrush.setBounds(16, 10, 77, 22);
         panelInput.add(chkAirbrush);
         
         JButton btnSaveFile = new JButton("Save");
@@ -330,7 +330,7 @@ public class dbc extends Canvas
 				}
         	}
         });
-        btnSaveFile.setBounds(10, 41, 91, 23);
+        btnSaveFile.setBounds(12, 41, 97, 23);
         panelInput.add(btnSaveFile);
         
         sliderAirbrush = new JSlider();
@@ -350,7 +350,7 @@ public class dbc extends Canvas
         panelInput.add(sliderAirbrush);
         
         lblAirbrushsize = new Label("Size: 5");
-        lblAirbrushsize.setBounds(104, 10, 47, 22);
+        lblAirbrushsize.setBounds(100, 10, 47, 22);
         panelInput.add(lblAirbrushsize);
         btnClear.addMouseListener(new MouseAdapter() {
         	@Override
