@@ -28,9 +28,9 @@ public class UndirectedGraph {
 	 * @param strength
 	 */
 	public void addEdge(int vertex1, int vertex2, int strength) {
-		Edge edge = new Edge(vertex1, vertex2, strength);
+		Edge edge = new Edge(vertex2, strength);
 		vertices[vertex1].add(edge);
-		Edge edge2 = new Edge(vertex2, vertex1, strength);
+		Edge edge2 = new Edge(vertex1, strength);
 		vertices[vertex2].add(edge2);
 	}
 

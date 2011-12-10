@@ -1,16 +1,19 @@
 package graph;
 
+/**
+ * Edge with strength for graph
+ */
 public class Edge {
-	
-	private int source;
-	
+
+	/**
+	 * Target of edge
+	 */
 	private int target;
-	
+
+	/**
+	 * Edge strength
+	 */
 	private int strength;
-	
-	public int getSource() {
-		return source;
-	}
 
 	public int getTarget() {
 		return target;
@@ -20,10 +23,9 @@ public class Edge {
 		return strength;
 	}
 
-	public Edge(int source, int target, int strength) {
-		this.source = source;
+	public Edge(int target, int strength) {
 		this.target = target;
 		this.strength = strength;
 	}
-	
+
 }
