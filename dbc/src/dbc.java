@@ -46,9 +46,9 @@ public class dbc extends Canvas
 	private static JSpinner dcborEps;
 	private static TextArea dcborFreqtable;
 	private static JSpinner snnK;
-	private static JSpinner snnCore;
+	private static JSpinner snnMinPts;
 	private static JSpinner snnNoise;
-	private static JSpinner snnLink;
+	private static JSpinner snnEps;
 	
 	public static String freqtable = "";
 
@@ -89,7 +89,7 @@ public class dbc extends Canvas
     
     public static void clustering3() {
 //    	kontroll.setText("SNN algorithm: running");
-    	ClusteringAlgorithm algorithm = new SNN(points, (Integer) snnK.getValue(), (Integer) snnCore.getValue(), (Integer) snnNoise.getValue(), (Integer) snnLink.getValue());
+    	ClusteringAlgorithm algorithm = new SNN(points, (Integer) snnK.getValue(), (Integer) snnMinPts.getValue(), (Integer) snnEps.getValue());
     	try {
     		int clusters = algorithm.run();
 //    		kontroll.setText("SNN algorithm: finished");
@@ -471,41 +471,32 @@ public class dbc extends Canvas
         panelSnn.add(btnClustering3);
         btnClustering3.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
         
-        JLabel lblsnnK = new JLabel("K:");
+        JLabel lblsnnK = new JLabel("k:");
         lblsnnK.setBounds(10, 15, 81, 14);
         panelSnn.add(lblsnnK);
         
-        JLabel lblsnnCore = new JLabel("Core threshold:");
+        JLabel lblsnnCore = new JLabel("MinPts:");
         lblsnnCore.setBounds(12, 43, 81, 14);
         panelSnn.add(lblsnnCore);
         
-        snnCore = new JSpinner();
-        snnCore.setBounds(103, 39, 42, 20);
-        panelSnn.add(snnCore);
-        snnCore.setModel(new SpinnerNumberModel(new Integer(5), new Integer(0), null, new Integer(1)));
+        snnMinPts = new JSpinner();
+        snnMinPts.setBounds(103, 39, 42, 20);
+        panelSnn.add(snnMinPts);
+        snnMinPts.setModel(new SpinnerNumberModel(new Integer(7), new Integer(0), null, new Integer(1)));
         
         snnK = new JSpinner();
         snnK.setBounds(103, 11, 42, 20);
         panelSnn.add(snnK);
-        snnK.setModel(new SpinnerNumberModel(new Integer(5), new Integer(0), null, new Integer(1)));
+        snnK.setModel(new SpinnerNumberModel(new Integer(10), new Integer(0), null, new Integer(1)));
         
-        JLabel lblsnnNoise = new JLabel("Noise threshold:");
-        lblsnnNoise.setBounds(176, 15, 81, 14);
-        panelSnn.add(lblsnnNoise);
-        
-        JLabel lblsnnLink = new JLabel("Link threshold:");
-        lblsnnLink.setBounds(176, 43, 81, 14);
+        JLabel lblsnnLink = new JLabel("Eps:");
+        lblsnnLink.setBounds(176, 15, 81, 14);
         panelSnn.add(lblsnnLink);
         
-        snnNoise = new JSpinner();
-        snnNoise.setBounds(267, 11, 42, 20);
-        panelSnn.add(snnNoise);
-        snnNoise.setModel(new SpinnerNumberModel(new Integer(3), new Integer(0), null, new Integer(1)));
-        
-        snnLink = new JSpinner();
-        snnLink.setBounds(267, 39, 42, 20);
-        panelSnn.add(snnLink);
-        snnLink.setModel(new SpinnerNumberModel(new Integer(2), new Integer(0), null, new Integer(1)));
+        snnEps = new JSpinner();
+        snnEps.setBounds(267, 11, 42, 20);
+        panelSnn.add(snnEps);
+        snnEps.setModel(new SpinnerNumberModel(new Integer(5), new Integer(0), null, new Integer(1)));
         btnClustering3.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent arg0) {

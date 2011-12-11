@@ -15,22 +15,17 @@ public class SNN implements ClusteringAlgorithm {
 	/**
 	 * Number of closest neighbors to compare
 	 */
-	private int K;
+	private int k;
 
 	/**
 	 * Links strength threshold for core point
 	 */
-	private int coreThreshold;
-
-	/**
-	 * Links strength threshold for noise point, noise points lower than this
-	 */
-	private int noiseThreshold;
+	private int minPts;
 
 	/**
 	 * Link strength threshold
 	 */
-	private int linkThreshold;
+	private int eps;
 
 	/**
 	 * Points to compare
@@ -47,27 +42,11 @@ public class SNN implements ClusteringAlgorithm {
 	 */
 	private UndirectedGraph SNNGraph;
 
-	/**
-	 * SNN clustering
-	 * 
-	 * @param points
-	 *            ArrayList of points to cluster
-	 * @param K
-	 *            number of most similar neighbors to compare
-	 * @param coreThreshold
-	 *            density threshold for core points
-	 * @param noiseThreshold
-	 *            density threshold for noise points
-	 * @param linkThreshold
-	 *            similarity threshold for same cluster
-	 */
-	public SNN(ArrayList<DataPoint> points, int K, int coreThreshold,
-			int noiseThreshold, int linkThreshold) {
+	public SNN(ArrayList<DataPoint> points, int k, int minPts, int eps) {
 		this.points = points;
-		this.K = K;
-		this.coreThreshold = coreThreshold;
-		this.noiseThreshold = noiseThreshold;
-		this.linkThreshold = linkThreshold;
+		this.k = k;
+		this.minPts = minPts;
+		this.eps = eps;
 	}
 
 	/*
@@ -81,7 +60,7 @@ public class SNN implements ClusteringAlgorithm {
 			throw new AlgorithmException("Nothing to cluster.");
 		}
 
-		if (points.size() < K + 1) {
+		if (points.size() < k + 1) {
 			throw new AlgorithmException(
 					"You need at least K + 1 points to cluster.");
 		}
@@ -90,9 +69,7 @@ public class SNN implements ClusteringAlgorithm {
 
 		createSNNGraph(getKNearest());
 
-		findCoreAndNoise();
-
-		removeUnimportantLinks();
+		findCorePoints();
 
 		return formClusters();
 	}
@@ -117,7 +94,7 @@ public class SNN implements ClusteringAlgorithm {
 	 * @return matrix with only K nearest
 	 */
 	private int[][] getKNearest() {
-		int[][] kNearest = new int[points.size()][K];
+		int[][] kNearest = new int[points.size()][k];
 		double[] key = new double[2];
 		Object[] nearest;
 		for (int i  = 0; i < points.size(); i++) {
@@ -125,9 +102,9 @@ public class SNN implements ClusteringAlgorithm {
 			key[1] = points.get(i).getY();
 
 			// get K + 1 nearest, first is this point
-			nearest = kdtree.nearest(key, K + 1);
+			nearest = kdtree.nearest(key, k + 1);
 			
-			for (int j = 1; j <= K; j++) {
+			for (int j = 1; j <= k; j++) {
 				kNearest[i][j - 1] = (Integer) nearest[j];
 			}
 			Arrays.sort(kNearest[i]);
@@ -165,60 +142,41 @@ public class SNN implements ClusteringAlgorithm {
 	}
 
 	/**
-	 * For every data point in the graph, calculate the total strength of links
-	 * coming out of the point.
+	 * Find the SNN density of each point
 	 * 
 	 * @param matrix
 	 * @return
 	 */
-	private int[] calcLinksTotal() {
+	private int[] calcSNNDensity() {
 		int[] links = new int[points.size()];
 		for (int i = 0; i < links.length; i++) {
 			links[i] = 0;
 			for (Edge edge : SNNGraph.getVertexEdges(i)) {
-				links[i] += edge.getStrength();
+				if (edge.getStrength() >= eps) {
+					links[i]++;
+				}
 			}
 		}
 		return links;
 	}
 
 	/**
-	 * Identify representative points by choosing the points that have high
-	 * density. Identify noise points by choosing the points that have low
-	 * density and remove them (into cluster 0, cluster for noise points).
+	 * Find the core points.
 	 * 
 	 * @param similarityMatrix
 	 */
-	private void findCoreAndNoise() {
-		int[] linksTotal = calcLinksTotal();
-		for (int i = 0; i < linksTotal.length; i++) {
-			// check if is core
-			points.get(i).setCore(linksTotal[i] >= coreThreshold);
-
-			// check if is noise
-			points.get(i).setCluster(linksTotal[i] < noiseThreshold ? 0 : -1);
+	private void findCorePoints() {
+		int[] SNNDensity = calcSNNDensity();
+		for (int i = 0; i < SNNDensity.length; i++) {
+			points.get(i).setCore(SNNDensity[i] >= minPts);
+			points.get(i).setCluster(-1);
 		}
 	}
 
 	/**
-	 * Remove all links between points that have weight smaller than a threshold
-	 */
-	private void removeUnimportantLinks() {
-		ArrayList<Edge> edges;
-		for (int i = 0; i < points.size(); i++) {
-			edges = SNNGraph.getVertexEdges(i);
-			for (int j = 0; j < edges.size(); j++) {
-				if (edges.get(j).getStrength() < linkThreshold)  {
-					edges.set(j, null);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Take connected components of points to form clusters, where every point
-	 * is a cluster is either a representative point (core) or is connected to a
-	 * representative point.
+	 * Form clusters from the core points.
+	 * Discard all noise points.
+	 * Assign all non-noise non-core points to clusters.
 	 * 
 	 * @param similarityMatrix
 	 */
@@ -243,7 +201,7 @@ public class SNN implements ClusteringAlgorithm {
 				j = (int) queue.poll();
 				
 				for (Edge edge : SNNGraph.getVertexEdges(j)) {
-					if (edge == null) {
+					if (edge.getStrength() < eps) {
 						continue;
 					}
 					k = edge.getTarget();
@@ -264,7 +222,7 @@ public class SNN implements ClusteringAlgorithm {
 				connectToStrength = 0;
 				
 				for (Edge edge : SNNGraph.getVertexEdges(i)) {
-					if (edge == null) {
+					if (edge.getStrength() < eps) {
 						continue;
 					}
 					j = edge.getTarget();
