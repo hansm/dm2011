@@ -50,9 +50,9 @@ public class DCBOR implements ClusteringAlgorithm {
 			}
 		}
 		
-		for(int i=0;i<ranges.length;i++) {
+		for(int i=0;i<ranges.length/2;i++) {
 			System.out.printf("%.2f - %.2f: %d points\n", ranges[i][0], ranges[i][1], count[i]);
-			dbc.freqtable = dbc.freqtable + String.format("%.2f - %.2f: %d points\n", ranges[i][0], ranges[i][1], count[i]);
+			dbc.freqtable = dbc.freqtable + String.format("%.2f - %.2f: %d points\t%.2f - %.2f: %d points\n", ranges[i][0], ranges[i][1], count[i+10], ranges[i+10][0], ranges[i+10][1], count[i]);
 		}
 	}
 	

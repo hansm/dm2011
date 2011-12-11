@@ -12,18 +12,39 @@ import net.sf.javaml.core.kdtree.KDTree;
  */
 public class SNN implements ClusteringAlgorithm {
 
+	/**
+	 * Number of closest neighbors to compare
+	 */
 	private int K;
 
+	/**
+	 * Links strength threshold for core point
+	 */
 	private int coreThreshold;
 
+	/**
+	 * Links strength threshold for noise point, noise points lower than this
+	 */
 	private int noiseThreshold;
 
+	/**
+	 * Link strength threshold
+	 */
 	private int linkThreshold;
 
+	/**
+	 * Points to compare
+	 */
 	private ArrayList<DataPoint> points;
 	
+	/**
+	 * KD-tree for quick finding of neighbors
+	 */
 	private KDTree kdtree;
 	
+	/**
+	 * Shared nearest neighborhood graph
+	 */
 	private UndirectedGraph SNNGraph;
 
 	/**
@@ -65,16 +86,9 @@ public class SNN implements ClusteringAlgorithm {
 					"You need at least K + 1 points to cluster.");
 		}
 		
-		// add points to KD-tree to find neighbors of all points
-		kdtree = new KDTree(2);
-		for (int i = 0; i < points.size(); i++) {
-			double[] key = {points.get(i).getX(), points.get(i).getY()};
-			kdtree.insert(key, i);
-		}
+		fillKDTree();
 
-		int[][] nearestNeighbors = getKNearest();
-
-		createSNNGraph(nearestNeighbors);
+		createSNNGraph(getKNearest());
 
 		findCoreAndNoise();
 
@@ -82,9 +96,23 @@ public class SNN implements ClusteringAlgorithm {
 
 		return formClusters();
 	}
+	
+	/**
+	 * Fill KD-tree for quick finding of K nearest neighbors
+	 */
+	private void fillKDTree() {
+		kdtree = new KDTree(2);
+		int size = points.size();
+		double[] key = new double[2];
+		for (int i = 0; i < size; i++) {
+			key[0] = points.get(i).getX();
+			key[1] = points.get(i).getY();
+			kdtree.insert(key, i);
+		}
+	}
 
 	/**
-	 * Get K-nearest points for each
+	 * Find K most similar neighbors of each point
 	 * 
 	 * @return matrix with only K nearest
 	 */
@@ -134,7 +162,6 @@ public class SNN implements ClusteringAlgorithm {
 				SNNGraph.addEdge(i, j, strength);
 			}
 		}
-		return;
 	}
 
 	/**
@@ -171,7 +198,6 @@ public class SNN implements ClusteringAlgorithm {
 			// check if is noise
 			points.get(i).setCluster(linksTotal[i] < noiseThreshold ? 0 : -1);
 		}
-		return;
 	}
 
 	/**
@@ -187,7 +213,6 @@ public class SNN implements ClusteringAlgorithm {
 				}
 			}
 		}
-		return;
 	}
 
 	/**
@@ -200,9 +225,11 @@ public class SNN implements ClusteringAlgorithm {
 	private int formClusters() {
 		int cluster = 0;
 		int j, k;
+		int size = points.size();
 		Queue<Integer> queue = new LinkedList<Integer>();
 
-		for (int i = 0; i < points.size(); i++) {
+		// BFS to connect core points into clusters
+		for (int i = 0; i < size; i++) {
 			if (points.get(i).getCluster() != -1 || !points.get(i).isCore()) {
 				continue;
 			}
@@ -210,7 +237,6 @@ public class SNN implements ClusteringAlgorithm {
 			// next cluster
 			cluster++;
 
-			// BFS to connect core points into clusters
 			queue.add(i);
 			points.get(i).setCluster(cluster);
 			while (!queue.isEmpty()) {
@@ -232,7 +258,7 @@ public class SNN implements ClusteringAlgorithm {
 		// connect all border points to nearest core point
 		DataPoint connectTo;
 		int connectToStrength;
-		for (int i = 0; i < points.size(); i++) {
+		for (int i = 0; i < size; i++) {
 			if (points.get(i).getCluster() == -1) {
 				connectTo = null;
 				connectToStrength = 0;
