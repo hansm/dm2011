@@ -25,7 +25,7 @@ public class SNNTest {
 		DataPoint p7 = new DataPoint(5, 5);
 		points.add(p7);
 
-		SNN algorithm = new SNN(points, 4, 2, 0, 2);
+		SNN algorithm = new SNN(points, 4, 2, 2);
 		try {
 			algorithm.run();
 		} catch (Exception e) {
@@ -62,7 +62,7 @@ public class SNNTest {
 		DataPoint p8 = new DataPoint(15, 6);
 		points.add(p8);
 
-		SNN algorithm = new SNN(points, 4, 2, 0, 2);
+		SNN algorithm = new SNN(points, 4, 1, 2);
 		try {
 			algorithm.run();
 		} catch (Exception e) {
@@ -85,7 +85,7 @@ public class SNNTest {
 		ArrayList<DataPoint> points = new ArrayList<DataPoint>();
 		points.add(new DataPoint(1, 2));
 
-		SNN algorithm = new SNN(points, 2, 2, 2, 2);
+		SNN algorithm = new SNN(points, 2, 2, 2);
 		algorithm.run();
 	}
 
