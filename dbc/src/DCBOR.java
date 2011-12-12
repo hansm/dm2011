@@ -44,6 +44,7 @@ public class DCBOR implements ClusteringAlgorithm {
 		
 		for(int i = 0; i< dpoints.length;i++){
 			cratio = dpoints[i].density / dpoints[dpoints.length-1].density;
+			System.out.println("cratio: "+cratio);
 			for(int j = 0; j< ranges.length; j++){
 				if(cratio >= ranges[j][0] && cratio <= ranges[j][1])
 					count[j]++;
@@ -129,13 +130,13 @@ public class DCBOR implements ClusteringAlgorithm {
 		createDensityList();
 		int numClusters = 0;
 		double threshold = 0.0;
-		ArrayList<PointDensity> seedlist;
-		ArrayList<PointDensity> resultlist;
+		ArrayList<PointDensity> seedlist = new ArrayList<PointDensity>();
 		
 		//Remove the outliers, mark as noise = 0
 		//Find the threshold 
 		//and initialize the points to unclustered = -1
 		for(int i = 0; i < dpoints.length; i++){
+			System.out.println("Density: "+dpoints[i].density / dpoints[dpoints.length-1].density);
 			if(dpoints[i].density / dpoints[dpoints.length-1].density > ratio)
 				dpoints[i].datapoint.cluster = 0;
 			else
@@ -144,6 +145,7 @@ public class DCBOR implements ClusteringAlgorithm {
 			if(dpoints[i].neighbors[0].distance > threshold)
 				threshold = dpoints[i].neighbors[0].distance;
 		}
+		System.out.println("Threshold: " + threshold);
 		
 		PointDensity p;
 		for(int i = 0; i< dpoints.length; i++){
@@ -152,24 +154,13 @@ public class DCBOR implements ClusteringAlgorithm {
 			
 			numClusters++;
 			
-			dpoints[i].datapoint.cluster = numClusters;
-			seedlist = appendPointsUnderThreshold(dpoints[i], threshold);
-			if(!seedlist.isEmpty()){
-				for(int j = 0; j<seedlist.size();j++)
-					seedlist.get(j).datapoint.cluster = numClusters;
-				
-				while(!seedlist.isEmpty()){
-					p = seedlist.remove(0);
-					resultlist = appendPointsUnderThreshold(p, threshold);
-					if(!resultlist.isEmpty()){
-						for(int j = 0; j < resultlist.size();j++)
-							if(resultlist.get(j).datapoint.cluster == -1){
-								seedlist.add(resultlist.get(j));
-								resultlist.get(j).datapoint.cluster = numClusters;
-							}
-					}
-				}
-			
+			seedlist.add(dpoints[i]);
+			while(!seedlist.isEmpty()){
+				p = seedlist.remove(0);
+				p.datapoint.cluster = numClusters;
+				for(int j = 0; j < p.neighbors.length;j++)
+					if(p.neighbors[j].p.datapoint.cluster == -1 && p.neighbors[j].distance < threshold)
+						seedlist.add(p.neighbors[j].p);
 			}
 		}
 		
