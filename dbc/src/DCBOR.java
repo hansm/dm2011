@@ -1,3 +1,4 @@
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.omg.CORBA.FREE_MEM;
@@ -29,6 +30,11 @@ public class DCBOR implements ClusteringAlgorithm {
 		}
 	}
 
+	double roundTwoDecimals(double d) {
+		DecimalFormat twoDForm = new DecimalFormat("#.##");
+		return Double.valueOf(twoDForm.format(d));
+	}
+
 	private void displayDensityHistogram() {
 		double[][] ranges = new double[20][2];
 		int[] count = new int[20];
@@ -37,15 +43,15 @@ public class DCBOR implements ClusteringAlgorithm {
 		double cratio = 0.0;
 
 		for (int i = 1; i < ranges.length; i++) {
-			ranges[i][0] = ranges[i - 1][1] + 0.01;
-			ranges[i][1] = ranges[i - 1][1] + 0.05;
+			ranges[i][0] = roundTwoDecimals(ranges[i - 1][1] + 0.01);
+			ranges[i][1] = roundTwoDecimals(ranges[i - 1][1] + 0.05);
 		}
 
 		for (int i = 0; i < dpoints.length; i++) {
-			cratio = dpoints[i].density / dpoints[dpoints.length - 1].density;
-			System.out.println("cratio: " + cratio);
+			cratio = roundTwoDecimals(dpoints[i].density / dpoints[dpoints.length - 1].density);
+//			System.out.println("cratio: " + cratio);
 			for (int j = 0; j < ranges.length; j++) {
-				if (cratio >= ranges[j][0] && cratio <= ranges[j][1]){
+				if (cratio >= ranges[j][0] && cratio <= ranges[j][1]) {
 					count[j]++;
 					break;
 				}
@@ -53,13 +59,11 @@ public class DCBOR implements ClusteringAlgorithm {
 		}
 
 		for (int i = 0; i < ranges.length / 2; i++) {
-			System.out.printf("%.2f - %.2f: %d points\n", ranges[i][0],
-					ranges[i][1], count[i]);
 			dbc.freqtable = dbc.freqtable
 					+ String.format(
-							"%.2f - %.2f: %d points\t%.2f - %.2f: %d points\n",
-							ranges[i][0], ranges[i][1], count[i + 10],
-							ranges[i + 10][0], ranges[i + 10][1], count[i]);
+							"%.2f - %.2f: %d pts\t%.2f - %.2f: %d pts\n",
+							ranges[i][0], ranges[i][1], count[i],
+							ranges[i + 10][0], ranges[i + 10][1], count[i + 10]);
 		}
 	}
 
@@ -80,7 +84,7 @@ public class DCBOR implements ClusteringAlgorithm {
 		displayDensityHistogram();
 	}
 
-	public int run2() throws AlgorithmException {
+	public int run() throws AlgorithmException {
 		createDensityList();
 		int numClusters = 0;
 		double threshold = 0.0;
@@ -93,11 +97,12 @@ public class DCBOR implements ClusteringAlgorithm {
 		for (int i = 0; i < dpoints.length; i++) {
 			if (dpoints[i].density / dpoints[dpoints.length - 1].density > ratio)
 				dpoints[i].datapoint.cluster = 0;
-			else
+			else {
 				dpoints[i].datapoint.cluster = -1;
 
-			if (dpoints[i].neighbors[0].distance > threshold)
-				threshold = dpoints[i].neighbors[0].distance;
+				if (dpoints[i].neighbors[0].distance > threshold)
+					threshold = dpoints[i].neighbors[0].distance;
+			}
 		}
 
 		PointDensity p;
@@ -131,7 +136,7 @@ public class DCBOR implements ClusteringAlgorithm {
 		return numClusters;
 	}
 
-	public int run() throws AlgorithmException {
+	public int run2() throws AlgorithmException {
 		createDensityList();
 		int numClusters = 0;
 		double threshold = 0.0;
@@ -179,7 +184,7 @@ public class DCBOR implements ClusteringAlgorithm {
 			double threshold) {
 		ArrayList<PointDensity> arr = new ArrayList<PointDensity>();
 		for (int i = 0; i < p.neighbors.length; i++) {
-			if (p.neighbors[i].distance < threshold)
+			if (p.neighbors[i].distance <= threshold)
 				arr.add(p.neighbors[i].p);
 		}
 		return arr;
