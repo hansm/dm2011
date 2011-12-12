@@ -108,20 +108,20 @@ public class DCBOR implements ClusteringAlgorithm {
 
 		PointDensity p;
 		for (int i = 0; i < dpoints.length; i++) {
-			if (dpoints[i].datapoint.cluster != -1)
+			if (dpoints[i].datapoint.cluster > -1)
 				continue;
 
 			numClusters++;
 
-			dpoints[i].datapoint.cluster = numClusters;
-			seedlist = appendPointsUnderThreshold(dpoints[i], threshold);
+			seedlist = DatasetRegionQuery(dpoints[i], threshold);
 			if (!seedlist.isEmpty()) {
 				for (int j = 0; j < seedlist.size(); j++)
 					seedlist.get(j).datapoint.cluster = numClusters;
+				seedlist.remove(0);
 
 				while (!seedlist.isEmpty()) {
 					p = seedlist.remove(0);
-					resultlist = appendPointsUnderThreshold(p, threshold);
+					resultlist = DatasetRegionQuery(p, threshold);
 					if (!resultlist.isEmpty()) {
 						for (int j = 0; j < resultlist.size(); j++)
 							if (resultlist.get(j).datapoint.cluster == -1) {
@@ -184,8 +184,8 @@ public class DCBOR implements ClusteringAlgorithm {
 							seedlist.add(p.neighbors[j].p);
 				}
 			}
-//			if (clusterSize == 1)
-//				dpoints[i].datapoint.cluster = dpoints[i].neighbors[0].p.datapoint.cluster;
+			if (clusterSize == 1)
+				dpoints[i].datapoint.cluster = dpoints[i].neighbors[0].p.datapoint.cluster;
 		}
 		System.out.println("Num clusters: " + clusters.size());
 		for (int i = 0; i < clusters.size(); i++)
@@ -194,9 +194,10 @@ public class DCBOR implements ClusteringAlgorithm {
 		return numClusters;
 	}
 
-	private ArrayList<PointDensity> appendPointsUnderThreshold(PointDensity p,
+	private ArrayList<PointDensity> DatasetRegionQuery(PointDensity p,
 			double threshold) {
 		ArrayList<PointDensity> arr = new ArrayList<PointDensity>();
+		arr.add(p);
 		for (int i = 0; i < p.neighbors.length; i++) {
 			if (p.neighbors[i].distance <= threshold)
 				arr.add(p.neighbors[i].p);
