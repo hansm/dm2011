@@ -57,6 +57,7 @@ public class dbc extends Canvas
 	
     public dbc()
     {
+    	System.out.println(isDoubleBuffered());
     }
     
     // Clustering algorithms

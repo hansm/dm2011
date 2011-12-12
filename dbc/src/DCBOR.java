@@ -48,8 +48,9 @@ public class DCBOR implements ClusteringAlgorithm {
 		}
 
 		for (int i = 0; i < dpoints.length; i++) {
-			cratio = roundTwoDecimals(dpoints[i].density / dpoints[dpoints.length - 1].density);
-//			System.out.println("cratio: " + cratio);
+			cratio = roundTwoDecimals(dpoints[i].density
+					/ dpoints[dpoints.length - 1].density);
+			// System.out.println("cratio: " + cratio);
 			for (int j = 0; j < ranges.length; j++) {
 				if (cratio >= ranges[j][0] && cratio <= ranges[j][1]) {
 					count[j]++;
@@ -84,7 +85,7 @@ public class DCBOR implements ClusteringAlgorithm {
 		displayDensityHistogram();
 	}
 
-	public int run() throws AlgorithmException {
+	public int run2() throws AlgorithmException {
 		createDensityList();
 		int numClusters = 0;
 		double threshold = 0.0;
@@ -136,23 +137,23 @@ public class DCBOR implements ClusteringAlgorithm {
 		return numClusters;
 	}
 
-	public int run2() throws AlgorithmException {
+	public int run() throws AlgorithmException {
 		createDensityList();
 		int numClusters = 0;
 		double threshold = 0.0;
 		ArrayList<PointDensity> seedlist = new ArrayList<PointDensity>();
+		ArrayList<ArrayList<PointDensity>> clusters = new ArrayList<ArrayList<PointDensity>>();
 
 		// Remove the outliers, mark as noise = 0
 		// Find the threshold
 		// and initialize the points to unclustered = -1
 		for (int i = 0; i < dpoints.length; i++) {
-			System.out.println("Density: " + dpoints[i].density
-					/ dpoints[dpoints.length - 1].density);
 			if (dpoints[i].density / dpoints[dpoints.length - 1].density > ratio)
 				dpoints[i].datapoint.cluster = 0;
 			else {
 				dpoints[i].datapoint.cluster = -1;
-
+				System.out.println("distance: "
+						+ dpoints[i].neighbors[0].distance);
 				if (dpoints[i].neighbors[0].distance > threshold)
 					threshold = dpoints[i].neighbors[0].distance;
 			}
@@ -160,23 +161,36 @@ public class DCBOR implements ClusteringAlgorithm {
 		System.out.println("Threshold: " + threshold);
 
 		PointDensity p;
+		int clusterSize = 0;
 		for (int i = 0; i < dpoints.length; i++) {
-			if (dpoints[i].datapoint.cluster != -1)
+			if (dpoints[i].datapoint.cluster > -1)
 				continue;
 
+			clusterSize = 0;
 			numClusters++;
+			clusters.add(new ArrayList<PointDensity>());
 
 			seedlist.add(dpoints[i]);
+
 			while (!seedlist.isEmpty()) {
 				p = seedlist.remove(0);
-				p.datapoint.cluster = numClusters;
-				for (int j = 0; j < p.neighbors.length; j++)
-					if (p.neighbors[j].p.datapoint.cluster == -1
-							&& p.neighbors[j].distance < threshold)
-						seedlist.add(p.neighbors[j].p);
+				if (p.datapoint.cluster == -1) {
+					p.datapoint.cluster = numClusters;
+					clusterSize++;
+					clusters.get(clusters.size() - 1).add(p);
+					for (int j = 0; j < p.neighbors.length; j++)
+						if (p.neighbors[j].distance <= threshold
+								&& p.neighbors[j].p.datapoint.cluster == -1)
+							seedlist.add(p.neighbors[j].p);
+				}
 			}
+//			if (clusterSize == 1)
+//				dpoints[i].datapoint.cluster = dpoints[i].neighbors[0].p.datapoint.cluster;
 		}
-
+		System.out.println("Num clusters: " + clusters.size());
+		for (int i = 0; i < clusters.size(); i++)
+			System.out.println("Cluster " + i + " size: "
+					+ clusters.get(i).size());
 		return numClusters;
 	}
 
