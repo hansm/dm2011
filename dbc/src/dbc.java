@@ -91,6 +91,9 @@ public class dbc extends Canvas
     		JOptionPane.showMessageDialog(null, "There must be at least 11 points to use DCBOR!", "Too few points", JOptionPane.ERROR_MESSAGE);
     		return;
     	}
+    	System.out.println(dcborEps.getValue());
+    	System.out.println((Double) dcborEps.getValue());
+    	System.out.println(((Double)dcborEps.getValue()).doubleValue());
     	ClusteringAlgorithm dcbor = new DCBOR(points, (Double) dcborEps.getValue());
     	try {
 			int clusters = dcbor.run();
