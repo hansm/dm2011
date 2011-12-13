@@ -381,6 +381,10 @@ public class dbc extends Canvas
         panelInput.add(btnSaveFile);
         
         sliderAirbrush = new JSlider();
+        sliderAirbrush.setPaintTicks(true);
+        sliderAirbrush.setMajorTickSpacing(1);
+        sliderAirbrush.setMinorTickSpacing(1);
+        sliderAirbrush.setSnapToTicks(true);
         sliderAirbrush.setEnabled(false);
         sliderAirbrush.addMouseMotionListener(new MouseMotionAdapter() {
         	@Override
