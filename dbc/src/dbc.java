@@ -57,7 +57,6 @@ public class dbc extends Canvas
 	
     public dbc()
     {
-    	System.out.println(isDoubleBuffered());
     }
     
     // Clustering algorithms
@@ -67,16 +66,18 @@ public class dbc extends Canvas
 //    	kontroll.setText("DBSCAN algorithm: running");
     	ClusteringAlgorithm dbscan = new DBSCAN(points, (Integer) dbscanMinpts.getValue(), (Double) dbscanEps.getValue());
     	try {
+    		if(points.isEmpty())
+    			throw new AlgorithmException("Nothing to cluster!");
 			int clusters = dbscan.run();
 		}
     	catch (Error e){
     		JOptionPane.showMessageDialog(null, e, "An error occurred!", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
+//			e.printStackTrace();
     	}
     	catch (Exception e) {
 			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, e, "An error occurred!", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 //    	kontroll.setText("DBSCAN algorithm: finished");
     }
@@ -91,9 +92,15 @@ public class dbc extends Canvas
     	try {
 			int clusters = dcbor.run();
 			if (clusters > 0) dcborFreqtable.setText(freqtable);
-		} catch (AlgorithmException e) {
+		} 
+    	catch (Error e){
+    		JOptionPane.showMessageDialog(null, e, "An error occurred!", JOptionPane.ERROR_MESSAGE);
+//			e.printStackTrace();
+    	}
+    	catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e, "An error occurred!", JOptionPane.ERROR_MESSAGE);
+//			e.printStackTrace();
 		}
 //    	kontroll.setText("DCBOR algorithm: finished");
     }
@@ -104,10 +111,16 @@ public class dbc extends Canvas
     	try {
     		int clusters = algorithm.run();
 //    		kontroll.setText("SNN algorithm: finished");
-    	} catch (Exception e) {
-    		System.out.println(e.getMessage());
-//    		kontroll.setText(e.getMessage());
+    	} 
+    	catch (Error e){
+    		JOptionPane.showMessageDialog(null, e, "An error occurred!", JOptionPane.ERROR_MESSAGE);
+//			e.printStackTrace();
     	}
+    	catch (Exception e) {
+			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(null, e, "An error occurred!", JOptionPane.ERROR_MESSAGE);
+//			e.printStackTrace();
+		}
     }
     
     public void paint(Graphics g)
@@ -460,7 +473,7 @@ public class dbc extends Canvas
         panelDcbor.add(btnClustering2);
         btnClustering2.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
         
-        JLabel lbldcborEps = new JLabel("Eps:");
+        JLabel lbldcborEps = new JLabel("Outlier factor:");
         lbldcborEps.setBounds(10, 15, 81, 14);
         panelDcbor.add(lbldcborEps);
         

@@ -152,13 +152,13 @@ public class DCBOR implements ClusteringAlgorithm {
 				dpoints[i].datapoint.cluster = 0;
 			else {
 				dpoints[i].datapoint.cluster = -1;
-				System.out.println("distance: "
-						+ dpoints[i].neighbors[0].distance);
+//				System.out.println("distance: "
+//						+ dpoints[i].neighbors[0].distance);
 				if (dpoints[i].neighbors[0].distance > threshold)
 					threshold = dpoints[i].neighbors[0].distance;
 			}
 		}
-		System.out.println("Threshold: " + threshold);
+//		System.out.println("Threshold: " + threshold);
 
 		PointDensity p;
 		int clusterSize = 0;
@@ -184,8 +184,10 @@ public class DCBOR implements ClusteringAlgorithm {
 							seedlist.add(p.neighbors[j].p);
 				}
 			}
-			if (clusterSize == 1)
+			if (clusterSize == 1){
 				dpoints[i].datapoint.cluster = dpoints[i].neighbors[0].p.datapoint.cluster;
+				numClusters--;
+			}
 		}
 //		System.out.println("Num clusters: " + clusters.size());
 //		for (int i = 0; i < clusters.size(); i++)
