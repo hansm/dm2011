@@ -314,7 +314,11 @@ public class dbc extends Canvas
     			"The closer it's OF is to 1 the less dense a point is. The algorithm also helps the " +
     			"user in choosing a suitable OF by displaying the distribution of points in each OF " +
     			"range.";
-    	helpText[2] = "SNN\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...";
+		helpText[2] = "Shared nearest neighbor (SNN) is density based clustering algorithm designed to find clusters with different shapes, sizes, densities and in high dimensional data. SNN works similarly to DBSCAN, but it does not use Euclidean distance to define similarity and to find densities of points. Instead SNN defines similarity between points by the number of nearest neighbors these points share. For example if point p1 is close to point p2 and they are both close to a set of points S then their similarity is equal to the number of points in set S. Point density is defined as the number of points that are similar to point. This allows SNN to avoid problems with high dimensional data and also to identify clusters of different densities.\n"
+				+ "\nPARAMETERS\n"
+				+ "k - the neighborhood list size. If k is too small then even relatively uniform clusters will be broken up, if it is too big then smaller clusters will not be found.\n"
+				+ "MinPts - core point density threshold, points that have at least MinPts similar points will be considered core points."
+				+ "Eps - threshold for link strength, weaker links will be removed.";
         JFrame frmDensitybasedClustering = new JFrame();
         frmDensitybasedClustering.setIconImage(Toolkit.getDefaultToolkit().getImage(dbc.class.getResource("/images/icon-logo.gif")));
         frmDensitybasedClustering.setTitle("Density-based clustering");
