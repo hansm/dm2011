@@ -61,6 +61,8 @@ public class dbc extends Canvas
 	private static JInternalFrame frameHelp;
 	private static TextArea textareaHelp; 
 	private static String[] helpText = new String[3];
+	private static JLabel titleHelp; 
+	private static String[] helpTitle = new String[3];
 	
     public dbc()
     {
@@ -313,6 +315,7 @@ public class dbc extends Canvas
     			"\n" +
     			"\n    minPts - the minimum number of points in a datapoints's density-neighborhood required " +
     			"to form a new cluster.";
+    	helpTitle[0] = "DBSCAN";
     	helpText[1] = "DCBOR stands for Density Clustering Based on Outlier Removal. " +
     			"It is an enhanced version of the well known single link clustering algorithm. " +
     			"This algorithm provides outlier detection and data clustering simultaneously. " +
@@ -346,11 +349,13 @@ public class dbc extends Canvas
     			"The closer it's OF is to 1 the less dense a point is. The algorithm also helps the " +
     			"user in choosing a suitable OF by displaying the distribution of points in each OF " +
     			"range.";
+    	helpTitle[1] = "DCBOR";
 		helpText[2] = "Shared nearest neighbor (SNN) is density based clustering algorithm designed to find clusters with different shapes, sizes, densities and in high dimensional data. SNN works similarly to DBSCAN, but it does not use Euclidean distance to define similarity and to find densities of points. Instead SNN defines similarity between points by the number of nearest neighbors these points share. For example if point p1 is close to point p2 and they are both close to a set of points S then their similarity is equal to the number of points in set S. Point density is defined as the number of points that are similar to point. This allows SNN to avoid problems with high dimensional data and also to identify clusters of different densities.\n"
 				+ "\nPARAMETERS\n"
 				+ "k - the neighborhood list size. If k is too small then even relatively uniform clusters will be broken up, if it is too big then smaller clusters will not be found.\n"
 				+ "MinPts - core point density threshold, points that have at least MinPts similar points will be considered core points."
 				+ "Eps - threshold for link strength, weaker links will be removed.";
+		helpTitle[2] = "SNN";
         JFrame frmDensitybasedClustering = new JFrame();
         frmDensitybasedClustering.setIconImage(Toolkit.getDefaultToolkit().getImage(dbc.class.getResource("/images/icon-logo.gif")));
         frmDensitybasedClustering.setTitle("Density-based clustering");
@@ -376,8 +381,13 @@ public class dbc extends Canvas
         
         textareaHelp = new TextArea("", 0, 0, textareaHelp.SCROLLBARS_VERTICAL_ONLY);
         textareaHelp.setEditable(false);
-        textareaHelp.setBounds(10, 11, 411, 378);
+        textareaHelp.setBounds(10, 46, 411, 343);
         frameHelp.getContentPane().add(textareaHelp);
+        
+        titleHelp = new JLabel("");
+        titleHelp.setFont(new Font("Tahoma", Font.BOLD, 14));
+        titleHelp.setBounds(10, 11, 411, 29);
+        frameHelp.getContentPane().add(titleHelp);
         frameHelp.setVisible(true);
         frameHelp.setClosed(true);
         canvas.setBounds(5, 5, 500, 500);
@@ -559,6 +569,7 @@ public class dbc extends Canvas
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
         		textareaHelp.setText(helpText[0]);
+        		titleHelp.setText(helpTitle[0]);
         		frameHelp.setVisible(true);
         	}
         });
@@ -601,6 +612,7 @@ public class dbc extends Canvas
         	@Override
         	public void mouseClicked(MouseEvent e) {
         		textareaHelp.setText(helpText[1]);
+        		titleHelp.setText(helpTitle[1]);
         		frameHelp.setVisible(true);
         	}
         });
@@ -655,6 +667,7 @@ public class dbc extends Canvas
         	@Override
         	public void mouseClicked(MouseEvent e) {
         		textareaHelp.setText(helpText[2]);
+        		titleHelp.setText(helpTitle[2]);
         		frameHelp.setVisible(true);
         	}
         });
