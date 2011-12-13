@@ -68,8 +68,14 @@ public class dbc extends Canvas
     	ClusteringAlgorithm dbscan = new DBSCAN(points, (Integer) dbscanMinpts.getValue(), (Double) dbscanEps.getValue());
     	try {
 			int clusters = dbscan.run();
-		} catch (AlgorithmException e) {
+		}
+    	catch (Error e){
+    		JOptionPane.showMessageDialog(null, e, "An error occurred!", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+    	}
+    	catch (Exception e) {
 			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(null, e, "An error occurred!", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
 //    	kontroll.setText("DBSCAN algorithm: finished");
@@ -77,6 +83,10 @@ public class dbc extends Canvas
     
     public static void clustering2() {
 //    	kontroll.setText("DCBOR algorithm: running");
+    	if (points.size() < 11){
+    		JOptionPane.showMessageDialog(null, "There must be at least 11 points to use DCBOR!", "Too few points", JOptionPane.ERROR_MESSAGE);
+    		return;
+    	}
     	ClusteringAlgorithm dcbor = new DCBOR(points, (Double) dcborEps.getValue());
     	try {
 			int clusters = dcbor.run();
