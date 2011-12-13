@@ -10,11 +10,6 @@ public class DBSCAN implements ClusteringAlgorithm {
 		this.minPts = minPts;
 		this.eps = eps;
 		this.points = points;
-		distanceMatrix = computeSimilarityMatrix();
-
-		// initialize all points as unvisited (cluster = -1)
-		for (int i = 0; i < points.size(); i++)
-			points.get(i).cluster = -1;
 	}
 
 	private double[][] computeSimilarityMatrix() {
@@ -41,6 +36,11 @@ public class DBSCAN implements ClusteringAlgorithm {
 
 	@Override
 	public int run() throws AlgorithmException {
+		distanceMatrix = computeSimilarityMatrix();
+
+		// initialize all points as unvisited (cluster = -1)
+		for (int i = 0; i < points.size(); i++)
+			points.get(i).cluster = -1;
 		int numClusters = 0;
 		ArrayList<Integer> N;
 		ArrayList<Integer> N_prim;
