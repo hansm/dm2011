@@ -91,9 +91,6 @@ public class dbc extends Canvas
     		JOptionPane.showMessageDialog(null, "There must be at least 11 points to use DCBOR!", "Too few points", JOptionPane.ERROR_MESSAGE);
     		return;
     	}
-    	System.out.println(dcborEps.getValue());
-    	System.out.println((Double) dcborEps.getValue());
-    	System.out.println(((Double)dcborEps.getValue()).doubleValue());
     	ClusteringAlgorithm dcbor = new DCBOR(points, (Double) dcborEps.getValue());
     	try {
 			int clusters = dcbor.run();
@@ -287,9 +284,68 @@ public class dbc extends Canvas
 		}
 
     	createColors();
-    	helpText[0] = "DBSCAN\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...";
-    	helpText[1] = "DCBOR\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...";
-    	helpText[2] = "SNN\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...";
+    	helpText[0] = "DBSCAN (density-based spatial clustering of applications with noise)" +
+    			"is one of the most common clustering algorithms and also most cited in scientific literature." +
+    			"\nUnlike partitioning or hierarchical clustering algorithms, DBSCAN is based on density " +
+    			"based notion of clusters, this means that clusters are formed in most dense regions. " +
+    			"It is designed to be easy to use, requires minimal domain knowledge for clustering, " +
+    			"and can discover clusters of arbitrary shape. " +
+    			"\nDBSCAN needs 2 parameters as input: eps, neighborhood radius, and minPts, the " +
+    			"minimum number of points required to form a cluster. DBSCAN starts with a random point " +
+    			"and retrieves it’s density-reachable neighborhood. If it contains at least minPts " +
+    			"neighbors then a new cluster is started, otherwise point is marked as noise. Noise " +
+    			"points can be later added to other clusters. If point is part of a cluster then all " +
+    			"points in its neighborhood are also marked as part of this cluster. This continues until " +
+    			"the whole cluster is found, then a new unvisited point is taken and processed like " +
+    			"previous points." +
+    			"\nDBSCAN does not require user to know the number of clusters beforehand. It can also " +
+    			"find clusters of different shapes and has notion of noise."+
+    			"\n"+
+    			"\n"+
+    			"PARAMETERS\n"+
+    			"    eps - the radius of the neighborhood. This radius determines how distant points are " +
+    			"checked for each datapoint's density-reachable neighborhood." +
+    			"\n" +
+    			"\n    minPts - the minimum number of points in a datapoints's density-neighborhood required " +
+    			"to form a new cluster.";
+    	helpText[1] = "DCBOR stands for Density Clustering Based on Outlier Removal. " +
+    			"It is an enhanced version of the well known single link clustering algorithm. " +
+    			"This algorithm provides outlier detection and data clustering simultaneously. " +
+    			"The algorithm consists of two phases. During the first phase, it finds the k-nearest " +
+    			"neighbors of every datapoint and removes the outliers from the data set. During the second " +
+    			"phase, it uses the single link algorithm with simple modification to discover the genuine " +
+    			"clusters.\n" +
+    			"The whole algorithm is based on the notion of local density of datapoints." +
+    			"This local density is calculated for each datapoint and is basically the sum " +
+    			"of this datapoint's Euclidean distances to it's k-nearest neighbors (k=10 in this " +
+    			"implementation).\n" +
+    			"After this an outlier factor is calculated for each datapoint, which is that datapoint's " +
+    			"local density divided by the local density of the lowest density datapoint in the whole set. " +
+    			"Therefore it is a value between 0 and 1. All points having an outlier factor greater than " +
+    			"the value inputted by the user are disgarded as noise.\n" +
+    			"The clustering process is a middle ground between the single link algorithm and " +
+    			"DBSCAN, since in single link two points are merged in each step, but here " +
+    			"all points at distance from the current point that satisfy the threshold are " +
+    			"assigned to the current cluster. We can deduce a suitable value for the " +
+    			"threshold from the nearest neighbors of each leftover datapoint after removing " +
+    			"the outliers. We search for the maximum distance between a point and its first " +
+    			"nearest neighbor. This distance is the ideal distance for the threshold " +
+    			"(level of dissimilarity between clusters) according to the main idea of the single " +
+    			"link algorithm."+
+    			"\n"+
+    			"\n"+
+    			"PARAMETERS\n" +
+    			"    outlier factor - This allows the user to specify the outlier factor threshold." +
+    			"All points having an outlier factor greater than this are disgarded as noise." +
+    			"This allows to remove the low density points from the clustering process.\n" +
+    			"The closer it's OF is to 1 the less dense a point is. The algorithm also helps the " +
+    			"user in choosing a suitable OF by displaying the distribution of points in each OF " +
+    			"range.";
+		helpText[2] = "Shared nearest neighbor (SNN) is density based clustering algorithm designed to find clusters with different shapes, sizes, densities and in high dimensional data. SNN works similarly to DBSCAN, but it does not use Euclidean distance to define similarity and to find densities of points. Instead SNN defines similarity between points by the number of nearest neighbors these points share. For example if point p1 is close to point p2 and they are both close to a set of points S then their similarity is equal to the number of points in set S. Point density is defined as the number of points that are similar to point. This allows SNN to avoid problems with high dimensional data and also to identify clusters of different densities.\n"
+				+ "\nPARAMETERS\n"
+				+ "k - the neighborhood list size. If k is too small then even relatively uniform clusters will be broken up, if it is too big then smaller clusters will not be found.\n"
+				+ "MinPts - core point density threshold, points that have at least MinPts similar points will be considered core points."
+				+ "Eps - threshold for link strength, weaker links will be removed.";
         JFrame frmDensitybasedClustering = new JFrame();
         frmDensitybasedClustering.setIconImage(Toolkit.getDefaultToolkit().getImage(dbc.class.getResource("/images/icon-logo.gif")));
         frmDensitybasedClustering.setTitle("Density-based clustering");
