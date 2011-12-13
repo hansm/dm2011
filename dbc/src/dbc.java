@@ -58,14 +58,13 @@ public class dbc extends Canvas
 	
 	private static JInternalFrame frameHelp;
 	private static TextArea textareaHelp; 
+	private static String[] helpText = new String[3];
 	
     public dbc()
     {
     }
     
     // Clustering algorithms
-    // Type P: x, y, cluster (default -1)
-    // ArrayList<P> points
     public static void clustering1() {
 //    	kontroll.setText("DBSCAN algorithm: running");
     	ClusteringAlgorithm dbscan = new DBSCAN(points, (Integer) dbscanMinpts.getValue(), (Double) dbscanEps.getValue());
@@ -260,6 +259,9 @@ public class dbc extends Canvas
 		}
 
     	createColors();
+    	helpText[0] = "DBSCAN\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...";
+    	helpText[1] = "DCBOR\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...";
+    	helpText[2] = "SNN\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...";
         JFrame frmDensitybasedClustering = new JFrame();
         frmDensitybasedClustering.setIconImage(Toolkit.getDefaultToolkit().getImage(dbc.class.getResource("/images/icon-logo.gif")));
         frmDensitybasedClustering.setTitle("Density-based clustering");
@@ -481,7 +483,7 @@ public class dbc extends Canvas
         btnDbscanHelp.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
-        		textareaHelp.setText("DBSCAN\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...");
+        		textareaHelp.setText(helpText[0]);
         		frameHelp.setVisible(true);
         	}
         });
@@ -522,7 +524,7 @@ public class dbc extends Canvas
         btnDcborHelp.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent e) {
-        		textareaHelp.setText("DCBOR\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...");
+        		textareaHelp.setText(helpText[1]);
         		frameHelp.setVisible(true);
         	}
         });
@@ -571,7 +573,7 @@ public class dbc extends Canvas
         btnSnnHelp.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent e) {
-        		textareaHelp.setText("SNN\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...");
+        		textareaHelp.setText(helpText[2]);
         		frameHelp.setVisible(true);
         	}
         });
