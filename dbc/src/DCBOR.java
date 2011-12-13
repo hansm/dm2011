@@ -31,7 +31,7 @@ public class DCBOR implements ClusteringAlgorithm {
 	}
 
 	double roundTwoDecimals(double d) {
-		DecimalFormat twoDForm = new DecimalFormat("#.##");
+		DecimalFormat twoDForm = new DecimalFormat("#,##");
 		return Double.valueOf(twoDForm.format(d));
 	}
 
