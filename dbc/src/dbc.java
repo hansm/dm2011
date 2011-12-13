@@ -73,12 +73,12 @@ public class dbc extends Canvas
 		}
     	catch (Error e){
     		JOptionPane.showMessageDialog(null, e, "An error occurred!", JOptionPane.ERROR_MESSAGE);
-//			e.printStackTrace();
+			e.printStackTrace();
     	}
     	catch (Exception e) {
 			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, e, "An error occurred!", JOptionPane.ERROR_MESSAGE);
-//			e.printStackTrace();
+			e.printStackTrace();
 		}
 //    	kontroll.setText("DBSCAN algorithm: finished");
     }
