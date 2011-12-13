@@ -30,6 +30,8 @@ public class dbc extends Canvas
 	private static JLabel lblElements;
 	private static JLabel lblClusters;
 	private static List listClusters;
+	private static List listClustersizes;
+	private static ArrayList<Cluster> clusterlist = new ArrayList<Cluster>();
 	
 	private static File currentDir;
 	
@@ -131,7 +133,7 @@ public class dbc extends Canvas
     {
     	g.setColor(Color.gray);
     	    	
-    	if (clusters.size() == 0 || listClusters.getSelectedItem() == null) {
+    	if (clusterlist.size() == 0 || listClusters.getSelectedItem() == null) {
     		for (DataPoint point : points) {
         			g.setColor(Color.gray);
     	    		g.fillOval(point.x-(int)(dotSize/2), point.y-(int)(dotSize/2), dotSize, dotSize);
@@ -139,7 +141,7 @@ public class dbc extends Canvas
         	}
     	} else if (listClusters.getSelectedIndex() == 0) {
 	    	for (DataPoint point : points) {
-	    			g.setColor(colors[(point.cluster+1)%colors.length]);
+	    			g.setColor(colors[(point.cluster)%colors.length]);
 		    		g.fillOval(point.x-(int)(dotSize/2), point.y-(int)(dotSize/2), dotSize, dotSize);
 		    		g.setColor(Color.gray);
 	    		}
@@ -148,11 +150,12 @@ public class dbc extends Canvas
     		if (listClusters.getSelectedIndex() == 1) {
     			filterCluster = 0;
     		} else {
-    			filterCluster = Integer.parseInt(listClusters.getSelectedItem());
+//    			filterCluster = Integer.parseInt(listClusters.getSelectedItem());
+    			filterCluster = clusterlist.get(listClusters.getSelectedIndex()-2).id;
     		}
 	    	for (DataPoint point : points) {
 	    		g.setColor(Color.lightGray);
-	    		if (point.cluster == filterCluster) g.setColor(colors[(point.cluster+1)%colors.length]);
+	    		if (point.cluster == filterCluster) g.setColor(colors[(point.cluster)%colors.length]);
     	    	g.fillOval(point.x-(int)(dotSize/2), point.y-(int)(dotSize/2), dotSize, dotSize);
 	    		g.setColor(Color.lightGray);
 	    	}
@@ -189,13 +192,37 @@ public class dbc extends Canvas
     
     public static void countClusters() {
     	clusters.clear();
+//		for (DataPoint p : points) {
+//			if (p.getCluster() == 0) {
+//				continue;
+//			}
+//			clusters.add(p.getCluster());
+//		}
+    	lblClusters.setText(Integer.toString(clusters.size()));
+
+    	
+    	clusterlist.clear();
 		for (DataPoint p : points) {
 			if (p.getCluster() == 0) {
 				continue;
 			}
-			clusters.add(p.getCluster());
+			
+			boolean newCluster = true;
+			
+			for (Cluster c : clusterlist) {
+				if (c.id == p.cluster) {
+					c.size++;
+					newCluster = false;
+				} 	
+			}
+			if (newCluster) {
+				clusterlist.add(new Cluster(p.cluster, 1));
+			}
 		}
-		lblClusters.setText(Integer.toString(clusters.size()));
+		
+		lblClusters.setText(Integer.toString(clusterlist.size()));
+		
+		
     }
     
     public static void clustering(int c) {
@@ -219,8 +246,8 @@ public class dbc extends Canvas
     	listClusters.select(0);
     	listClusters.add("Noise");
     	
-    	for (Object cluster : clusters) {
-    		listClusters.add(cluster.toString());
+    	for (Cluster cluster : clusterlist) {
+    		listClusters.add(Integer.toString(cluster.id) + " (" + Integer.toString(cluster.size) + ")");
     	}
     	canvas.repaint();
     }
