@@ -31,8 +31,14 @@ public class DCBOR implements ClusteringAlgorithm {
 	}
 
 	double roundTwoDecimals(double d) {
-		DecimalFormat twoDForm = new DecimalFormat("#,##");
-		return Double.valueOf(twoDForm.format(d));
+		DecimalFormat twoDForm = new DecimalFormat("#.##");
+		try{
+			return Double.valueOf(twoDForm.format(d));
+		
+		}catch(NumberFormatException e){
+			twoDForm = new DecimalFormat("#,##");
+			return Double.valueOf(twoDForm.format(d));
+		}
 	}
 
 	private void displayDensityHistogram() {
