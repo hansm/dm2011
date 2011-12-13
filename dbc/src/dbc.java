@@ -516,7 +516,7 @@ public class dbc extends Canvas
         lbldcborEps.setBounds(10, 15, 81, 14);
         panelDcbor.add(lbldcborEps);
         
-        dcborEps = new JSpinner(new SpinnerNumberModel(0.5, 0.0, 1.0, 0.01));
+        dcborEps = new JSpinner(new SpinnerNumberModel(new Double(0.5), new Double(0.0), new Double(1.0), new Double(0.01)));
         dcborEps.setBounds(83, 11, 63, 20);
         panelDcbor.add(dcborEps);
         
