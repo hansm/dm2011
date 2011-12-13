@@ -32,13 +32,20 @@ public class DCBOR implements ClusteringAlgorithm {
 
 	double roundTwoDecimals(double d) {
 		DecimalFormat twoDForm = new DecimalFormat("#.##");
-		try{
+		try {
 			return Double.valueOf(twoDForm.format(d));
-		
-		}catch(NumberFormatException e){
+
+		} catch (NumberFormatException e) {
 			twoDForm = new DecimalFormat("#,##");
 			return Double.valueOf(twoDForm.format(d));
 		}
+	}
+
+	public static double Round(double Rval, int Rpl) {
+		double p = (double) Math.pow(10, Rpl);
+		Rval = Rval * p;
+		double tmp = Math.round(Rval);
+		return (double) tmp / p;
 	}
 
 	private void displayDensityHistogram() {
@@ -49,13 +56,13 @@ public class DCBOR implements ClusteringAlgorithm {
 		double cratio = 0.0;
 
 		for (int i = 1; i < ranges.length; i++) {
-			ranges[i][0] = roundTwoDecimals(ranges[i - 1][1] + 0.01);
-			ranges[i][1] = roundTwoDecimals(ranges[i - 1][1] + 0.05);
+			ranges[i][0] = Round(ranges[i - 1][1] + 0.01, 2);
+			ranges[i][1] = Round(ranges[i - 1][1] + 0.05, 2);
 		}
 
 		for (int i = 0; i < dpoints.length; i++) {
-			cratio = roundTwoDecimals(dpoints[i].density
-					/ dpoints[dpoints.length - 1].density);
+			cratio = Round(dpoints[i].density
+					/ dpoints[dpoints.length - 1].density,2);
 			// System.out.println("cratio: " + cratio);
 			for (int j = 0; j < ranges.length; j++) {
 				if (cratio >= ranges[j][0] && cratio <= ranges[j][1]) {
@@ -148,7 +155,8 @@ public class DCBOR implements ClusteringAlgorithm {
 		int numClusters = 0;
 		double threshold = 0.0;
 		ArrayList<PointDensity> seedlist = new ArrayList<PointDensity>();
-//		ArrayList<ArrayList<PointDensity>> clusters = new ArrayList<ArrayList<PointDensity>>();
+		// ArrayList<ArrayList<PointDensity>> clusters = new
+		// ArrayList<ArrayList<PointDensity>>();
 
 		// Remove the outliers, mark as noise = 0
 		// Find the threshold
@@ -158,13 +166,13 @@ public class DCBOR implements ClusteringAlgorithm {
 				dpoints[i].datapoint.cluster = 0;
 			else {
 				dpoints[i].datapoint.cluster = -1;
-//				System.out.println("distance: "
-//						+ dpoints[i].neighbors[0].distance);
+				// System.out.println("distance: "
+				// + dpoints[i].neighbors[0].distance);
 				if (dpoints[i].neighbors[0].distance > threshold)
 					threshold = dpoints[i].neighbors[0].distance;
 			}
 		}
-//		System.out.println("Threshold: " + threshold);
+		// System.out.println("Threshold: " + threshold);
 
 		PointDensity p;
 		int clusterSize = 0;
@@ -174,7 +182,7 @@ public class DCBOR implements ClusteringAlgorithm {
 
 			clusterSize = 0;
 			numClusters++;
-//			clusters.add(new ArrayList<PointDensity>());
+			// clusters.add(new ArrayList<PointDensity>());
 
 			seedlist.add(dpoints[i]);
 
@@ -183,22 +191,22 @@ public class DCBOR implements ClusteringAlgorithm {
 				if (p.datapoint.cluster == -1) {
 					p.datapoint.cluster = numClusters;
 					clusterSize++;
-//					clusters.get(clusters.size() - 1).add(p);
+					// clusters.get(clusters.size() - 1).add(p);
 					for (int j = 0; j < p.neighbors.length; j++)
 						if (p.neighbors[j].distance <= threshold
 								&& p.neighbors[j].p.datapoint.cluster == -1)
 							seedlist.add(p.neighbors[j].p);
 				}
 			}
-			if (clusterSize == 1){
+			if (clusterSize == 1) {
 				dpoints[i].datapoint.cluster = dpoints[i].neighbors[0].p.datapoint.cluster;
 				numClusters--;
 			}
 		}
-//		System.out.println("Num clusters: " + clusters.size());
-//		for (int i = 0; i < clusters.size(); i++)
-//			System.out.println("Cluster " + i + " size: "
-//					+ clusters.get(i).size());
+		// System.out.println("Num clusters: " + clusters.size());
+		// for (int i = 0; i < clusters.size(); i++)
+		// System.out.println("Cluster " + i + " size: "
+		// + clusters.get(i).size());
 		return numClusters;
 	}
 
