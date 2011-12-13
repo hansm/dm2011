@@ -19,6 +19,7 @@ import javax.swing.border.BevelBorder;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import java.beans.PropertyVetoException;
 
 public class dbc extends Canvas
 {
@@ -54,6 +55,9 @@ public class dbc extends Canvas
 
 	private static JSlider sliderAirbrush;
 	private static Label lblAirbrushsize; 
+	
+	private static JInternalFrame frameHelp;
+	private static TextArea textareaHelp; 
 	
     public dbc()
     {
@@ -209,10 +213,11 @@ public class dbc extends Canvas
 
   
     /**
+     * @throws PropertyVetoException 
      * @wbp.parser.entryPoint
      */
     @SuppressWarnings("deprecation")
-	public static void main(String[] args)
+	public static void main(String[] args) throws PropertyVetoException
     {
     	try {
 			UIManager.setLookAndFeel(
@@ -232,8 +237,38 @@ public class dbc extends Canvas
 		}
 
     	createColors();
-        canvas.setBounds(367, 43, 500, 500);
-    	
+        JFrame frmDensitybasedClustering = new JFrame();
+        frmDensitybasedClustering.setIconImage(Toolkit.getDefaultToolkit().getImage(dbc.class.getResource("/images/icon-logo.gif")));
+        frmDensitybasedClustering.setTitle("Density-based clustering");
+        frmDensitybasedClustering.setResizable(false);
+        frmDensitybasedClustering.setSize(1000, 600);
+        frmDensitybasedClustering.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frmDensitybasedClustering.getContentPane().setLayout(null);
+        
+        JPanel panelCanvas = new JPanel();
+        panelCanvas.setBounds(362, 38, 510, 510);
+        panelCanvas.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
+        frmDensitybasedClustering.getContentPane().add(panelCanvas);
+        panelCanvas.setLayout(null);
+        
+        frameHelp = new JInternalFrame("Help");
+        frameHelp.setBounds(34, 38, 437, 425);
+        panelCanvas.add(frameHelp);
+        frameHelp.setFrameIcon(new ImageIcon(dbc.class.getResource("/images/icon-help.gif")));
+        frameHelp.setEnabled(false);
+        frameHelp.setClosable(true);
+        frameHelp.setVisible(false);
+        frameHelp.getContentPane().setLayout(null);
+        
+        textareaHelp = new TextArea("", 0, 0, dcborFreqtable.SCROLLBARS_VERTICAL_ONLY);
+        textareaHelp.setEditable(false);
+        textareaHelp.setBounds(10, 11, 411, 378);
+        frameHelp.getContentPane().add(textareaHelp);
+        frameHelp.setVisible(true);
+        frameHelp.setClosed(true);
+        canvas.setBounds(5, 5, 500, 500);
+        panelCanvas.add(canvas);
+        
         canvas.setBackground(Color.WHITE);
         canvas.addMouseListener(new MouseAdapter() {
         	public void mouseClicked(MouseEvent e) {
@@ -251,20 +286,6 @@ public class dbc extends Canvas
         	}
         	
         });
-        JFrame frmDensitybasedClustering = new JFrame();
-        frmDensitybasedClustering.setIconImage(Toolkit.getDefaultToolkit().getImage(dbc.class.getResource("/images/icon-logo.gif")));
-        frmDensitybasedClustering.setTitle("Density-based clustering");
-        frmDensitybasedClustering.setResizable(false);
-        frmDensitybasedClustering.setSize(1000, 600);
-        frmDensitybasedClustering.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frmDensitybasedClustering.getContentPane().setLayout(null);
-        frmDensitybasedClustering.getContentPane().add(canvas);
-        
-        JPanel panelCanvas = new JPanel();
-        panelCanvas.setBounds(362, 38, 510, 510);
-        panelCanvas.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-        frmDensitybasedClustering.getContentPane().add(panelCanvas);
-        panelCanvas.setLayout(null);
         
         JPanel panelInput = new JPanel();
         panelInput.setBounds(15, 163, 327, 76);
@@ -432,6 +453,18 @@ public class dbc extends Canvas
         dbscanMinpts.setBounds(83, 39, 63, 20);
         panelDbscan.add(dbscanMinpts);
         dbscanMinpts.setModel(new SpinnerNumberModel(new Integer(5), new Integer(0), null, new Integer(1)));
+        
+        JButton btnDbscanHelp = new JButton("");
+        btnDbscanHelp.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent arg0) {
+        		textareaHelp.setText("DBSCAN\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...");
+        		frameHelp.setVisible(true);
+        	}
+        });
+        btnDbscanHelp.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-help.gif")));
+        btnDbscanHelp.setBounds(295, 0, 22, 23);
+        panelDbscan.add(btnDbscanHelp);
         btnClustering1.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
@@ -462,13 +495,25 @@ public class dbc extends Canvas
         dcborFreqtable.setBounds(10, 69, 307, 185);
         panelDcbor.add(dcborFreqtable);
         
+        JButton btnDcborHelp = new JButton("");
+        btnDcborHelp.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		textareaHelp.setText("DCBOR\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...");
+        		frameHelp.setVisible(true);
+        	}
+        });
+        btnDcborHelp.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-help.gif")));
+        btnDcborHelp.setBounds(295, 0, 22, 23);
+        panelDcbor.add(btnDcborHelp);
+        
         panelSnn = new JPanel();
         tabbedPane.addTab("SNN", new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")), panelSnn, null);
         tabbedPane.setEnabledAt(2, true);
         panelSnn.setLayout(null);
         
         JButton btnClustering3 = new JButton("SNN");
-        btnClustering3.setBounds(10, 70, 307, 23);
+        btnClustering3.setBounds(10, 107, 307, 23);
         panelSnn.add(btnClustering3);
         btnClustering3.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")));
         
@@ -491,13 +536,25 @@ public class dbc extends Canvas
         snnK.setModel(new SpinnerNumberModel(new Integer(10), new Integer(0), null, new Integer(1)));
         
         JLabel lblsnnLink = new JLabel("Eps:");
-        lblsnnLink.setBounds(176, 15, 81, 14);
+        lblsnnLink.setBounds(10, 71, 81, 14);
         panelSnn.add(lblsnnLink);
         
         snnEps = new JSpinner();
-        snnEps.setBounds(267, 11, 42, 20);
+        snnEps.setBounds(103, 67, 42, 20);
         panelSnn.add(snnEps);
         snnEps.setModel(new SpinnerNumberModel(new Integer(5), new Integer(0), null, new Integer(1)));
+        
+        JButton btnSnnHelp = new JButton("");
+        btnSnnHelp.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		textareaHelp.setText("SNN\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...\nBla...");
+        		frameHelp.setVisible(true);
+        	}
+        });
+        btnSnnHelp.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-help.gif")));
+        btnSnnHelp.setBounds(295, 0, 22, 23);
+        panelSnn.add(btnSnnHelp);
         btnClustering3.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent arg0) {
