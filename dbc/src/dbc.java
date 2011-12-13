@@ -27,8 +27,6 @@ public class dbc extends Canvas
 	public final static dbc canvas = new dbc();
 	private static JPanel panelDcbor;
 	private static JPanel panelSnn;
-	
-	private static Checkbox chkAirbrush;
 	private static JLabel lblElements;
 	private static JLabel lblClusters;
 	private static List listClusters;
@@ -300,16 +298,12 @@ public class dbc extends Canvas
         canvas.setBackground(Color.WHITE);
         canvas.addMouseListener(new MouseAdapter() {
         	public void mouseClicked(MouseEvent e) {
-        		if (chkAirbrush.getState()) {
-        			for (int i = 0; i < sliderAirbrush.getValue(); i++) {
-        				Point tmp = e.getPoint();
-        				tmp.x = tmp.x + (int)(Math.random()*6*sliderAirbrush.getValue()-3*sliderAirbrush.getValue());
-        				tmp.y = tmp.y + (int)(Math.random()*6*sliderAirbrush.getValue()-3*sliderAirbrush.getValue());
-        				if (tmp.x > 0 && tmp.x < 500 && tmp.y > 0 && tmp.y < 500) addPoint(tmp);
-        			}
-        		} else {
-        			addPoint(e.getPoint());
-        		}
+    			for (int i = 0; i < sliderAirbrush.getValue(); i++) {
+    				Point tmp = e.getPoint();
+    				tmp.x = tmp.x + (int)(Math.random()*6*sliderAirbrush.getValue()-3*sliderAirbrush.getValue());
+    				tmp.y = tmp.y + (int)(Math.random()*6*sliderAirbrush.getValue()-3*sliderAirbrush.getValue());
+    				if (tmp.x > 0 && tmp.x < 500 && tmp.y > 0 && tmp.y < 500) addPoint(tmp);
+    			}
     			canvas.repaint();
         	}
         	
@@ -330,19 +324,6 @@ public class dbc extends Canvas
         btnClear.setBounds(220, 41, 97, 23);
         panelInput.add(btnClear);
         btnClear.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-delete.gif")));
-        
-        chkAirbrush = new Checkbox("Airbrush");
-        chkAirbrush.addItemListener(new ItemListener() {
-        	public void itemStateChanged(ItemEvent arg0) {
-        		if (chkAirbrush.getState()) {
-        			sliderAirbrush.setEnabled(true);
-        		} else {
-        			sliderAirbrush.setEnabled(false);
-        		}
-        	}
-        });
-        chkAirbrush.setBounds(16, 10, 77, 22);
-        panelInput.add(chkAirbrush);
         
         JButton btnSaveFile = new JButton("Save");
         btnSaveFile.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-save.gif")));
@@ -384,23 +365,26 @@ public class dbc extends Canvas
         panelInput.add(btnSaveFile);
         
         sliderAirbrush = new JSlider();
-        sliderAirbrush.setEnabled(false);
+        sliderAirbrush.setPaintTicks(true);
+        sliderAirbrush.setMajorTickSpacing(1);
+        sliderAirbrush.setMinorTickSpacing(1);
+        sliderAirbrush.setSnapToTicks(true);
         sliderAirbrush.addMouseMotionListener(new MouseMotionAdapter() {
         	@Override
         	public void mouseDragged(MouseEvent arg0) {
-        		lblAirbrushsize.setText("Size: " + Integer.toString(sliderAirbrush.getValue()));
+        		lblAirbrushsize.setText("Number of points: " + Integer.toString(sliderAirbrush.getValue()));
         	}
         });
         
         
-        sliderAirbrush.setValue(5);
-        sliderAirbrush.setMinimum(2);
+        sliderAirbrush.setValue(1);
+        sliderAirbrush.setMinimum(1);
         sliderAirbrush.setMaximum(8);
         sliderAirbrush.setBounds(157, 10, 160, 24);
         panelInput.add(sliderAirbrush);
         
-        lblAirbrushsize = new Label("Size: 5");
-        lblAirbrushsize.setBounds(100, 10, 47, 22);
+        lblAirbrushsize = new Label("Number of points: 1");
+        lblAirbrushsize.setBounds(12, 10, 120, 22);
         panelInput.add(lblAirbrushsize);
         btnClear.addMouseListener(new MouseAdapter() {
         	@Override
