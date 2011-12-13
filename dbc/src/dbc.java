@@ -46,12 +46,14 @@ public class dbc extends Canvas
 	private static JSpinner dbscanMinpts;
 	private static JSpinner dcborEps;
 	private static TextArea dcborFreqtable;
+	private static TextArea dcborFreqtable1;
 	private static JSpinner snnK;
 	private static JSpinner snnMinPts;
 	private static JSpinner snnNoise;
 	private static JSpinner snnEps;
 	
 	public static String freqtable = "";
+	public static String freqtable1 = "";
 
 	private static JSlider sliderAirbrush;
 	private static Label lblAirbrushsize; 
@@ -94,7 +96,10 @@ public class dbc extends Canvas
     	ClusteringAlgorithm dcbor = new DCBOR(points, (Double) dcborEps.getValue());
     	try {
 			int clusters = dcbor.run();
-			if (clusters > 0) dcborFreqtable.setText(freqtable);
+			if (clusters > 0) {
+				dcborFreqtable.setText(freqtable);
+				dcborFreqtable1.setText(freqtable1);
+			}
 		} 
     	catch (Error e){
     		JOptionPane.showMessageDialog(null, e, "An error occurred!", JOptionPane.ERROR_MESSAGE);
@@ -171,7 +176,6 @@ public class dbc extends Canvas
     {
     	points.add(new DataPoint(p)); 
     	lblElements.setText(Integer.toString(points.size()));
-//    	kontroll.setText((p.x / 50) + " " + (4 * p.y / 125) + " = " + (int)(Math.floor(p.x / 125) + 4 * Math.floor(p.y / 125)));
     }
    
     public static void createColors() {
@@ -195,7 +199,7 @@ public class dbc extends Canvas
 //			}
 //			clusters.add(p.getCluster());
 //		}
-    	lblClusters.setText(Integer.toString(clusters.size()));
+//    	lblClusters.setText(Integer.toString(clusters.size()));
 
     	
     	clusterlist.clear();
@@ -224,6 +228,7 @@ public class dbc extends Canvas
     
     public static void clustering(int c) {
     	freqtable = "";
+    	freqtable1 = "";
     	dcborFreqtable.setText("");
     	switch(c) {
     	case 1:
@@ -369,7 +374,7 @@ public class dbc extends Canvas
         frameHelp.setVisible(false);
         frameHelp.getContentPane().setLayout(null);
         
-        textareaHelp = new TextArea("", 0, 0, dcborFreqtable.SCROLLBARS_VERTICAL_ONLY);
+        textareaHelp = new TextArea("", 0, 0, textareaHelp.SCROLLBARS_VERTICAL_ONLY);
         textareaHelp.setEditable(false);
         textareaHelp.setBounds(10, 11, 411, 378);
         frameHelp.getContentPane().add(textareaHelp);
@@ -586,8 +591,9 @@ public class dbc extends Canvas
         dcborEps.setBounds(83, 11, 63, 20);
         panelDcbor.add(dcborEps);
         
-        dcborFreqtable = new TextArea("", 0, 0, dcborFreqtable.SCROLLBARS_VERTICAL_ONLY);
-        dcborFreqtable.setBounds(10, 69, 307, 185);
+        dcborFreqtable = new TextArea("", 0, 0, dcborFreqtable.SCROLLBARS_NONE);
+        dcborFreqtable.setEditable(false);
+        dcborFreqtable.setBounds(10, 69, 153, 185);
         panelDcbor.add(dcborFreqtable);
         
         JButton btnDcborHelp = new JButton("");
@@ -601,6 +607,11 @@ public class dbc extends Canvas
         btnDcborHelp.setIcon(new ImageIcon(dbc.class.getResource("/images/icon-help.gif")));
         btnDcborHelp.setBounds(295, 0, 22, 23);
         panelDcbor.add(btnDcborHelp);
+        
+        dcborFreqtable1 = new TextArea("", 0, 0, dcborFreqtable1.SCROLLBARS_NONE);
+        dcborFreqtable1.setEditable(false);
+        dcborFreqtable1.setBounds(164, 69, 153, 185);
+        panelDcbor.add(dcborFreqtable1);
         
         panelSnn = new JPanel();
         tabbedPane.addTab("SNN", new ImageIcon(dbc.class.getResource("/images/icon-cluster.gif")), panelSnn, null);

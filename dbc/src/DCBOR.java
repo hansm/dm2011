@@ -75,8 +75,11 @@ public class DCBOR implements ClusteringAlgorithm {
 		for (int i = 0; i < ranges.length / 2; i++) {
 			dbc.freqtable = dbc.freqtable
 					+ String.format(
-							"%.2f - %.2f: %d pts\t%.2f - %.2f: %d pts\n",
-							ranges[i][0], ranges[i][1], count[i],
+							"%.2f - %.2f: %d pts\n",
+							ranges[i][0], ranges[i][1], count[i]);
+			dbc.freqtable1 = dbc.freqtable1
+					+ String.format(
+							"%.2f - %.2f: %d pts\n",
 							ranges[i + 10][0], ranges[i + 10][1], count[i + 10]);
 		}
 	}
