@@ -11,14 +11,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.border.BevelBorder;
 import java.awt.event.MouseMotionAdapter;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
 import java.beans.PropertyVetoException;
 
 public class dbc extends Canvas
@@ -30,13 +27,11 @@ public class dbc extends Canvas
 	private static JLabel lblElements;
 	private static JLabel lblClusters;
 	private static List listClusters;
-	private static List listClustersizes;
 	private static ArrayList<Cluster> clusterlist = new ArrayList<Cluster>();
 	
 	private static File currentDir;
 	
 	public static ArrayList<DataPoint> points = new ArrayList<DataPoint>();
-	public static HashSet clusters = new HashSet();
 	
 	public static Color[] colors = new Color[25];
 	
@@ -49,7 +44,6 @@ public class dbc extends Canvas
 	private static TextArea dcborFreqtable1;
 	private static JSpinner snnK;
 	private static JSpinner snnMinPts;
-	private static JSpinner snnNoise;
 	private static JSpinner snnEps;
 	
 	public static String freqtable = "";
@@ -70,7 +64,6 @@ public class dbc extends Canvas
     
     // Clustering algorithms
     public static void clustering1() {
-//    	kontroll.setText("DBSCAN algorithm: running");
     	ClusteringAlgorithm dbscan = new DBSCAN(points, (Integer) dbscanMinpts.getValue(), (Double) dbscanEps.getValue());
     	try {
     		if(points.isEmpty())
@@ -82,15 +75,12 @@ public class dbc extends Canvas
 			e.printStackTrace();
     	}
     	catch (Exception e) {
-			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, e, "An error occurred!", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
-//    	kontroll.setText("DBSCAN algorithm: finished");
     }
     
     public static void clustering2() {
-//    	kontroll.setText("DCBOR algorithm: running");
     	if (points.size() < 11){
     		JOptionPane.showMessageDialog(null, "There must be at least 11 points to use DCBOR!", "Too few points", JOptionPane.ERROR_MESSAGE);
     		return;
@@ -108,28 +98,21 @@ public class dbc extends Canvas
 			e.printStackTrace();
     	}
     	catch (Exception e) {
-			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, e, "An error occurred!", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
-//    	kontroll.setText("DCBOR algorithm: finished");
     }
     
     public static void clustering3() {
-//    	kontroll.setText("SNN algorithm: running");
     	ClusteringAlgorithm algorithm = new SNN(points, (Integer) snnK.getValue(), (Integer) snnMinPts.getValue(), (Integer) snnEps.getValue());
     	try {
     		int clusters = algorithm.run();
-//    		kontroll.setText("SNN algorithm: finished");
     	} 
     	catch (Error e){
     		JOptionPane.showMessageDialog(null, e, "An error occurred!", JOptionPane.ERROR_MESSAGE);
-//			e.printStackTrace();
     	}
     	catch (Exception e) {
-			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, e, "An error occurred!", JOptionPane.ERROR_MESSAGE);
-//			e.printStackTrace();
 		}
     }
     
@@ -154,7 +137,6 @@ public class dbc extends Canvas
     		if (listClusters.getSelectedIndex() == 1) {
     			filterCluster = 0;
     		} else {
-//    			filterCluster = Integer.parseInt(listClusters.getSelectedItem());
     			filterCluster = clusterlist.get(listClusters.getSelectedIndex()-2).id;
     		}
 	    	for (DataPoint point : points) {
@@ -165,13 +147,6 @@ public class dbc extends Canvas
 	    	}
 	    }
     	g.setColor(Color.gray);
-    	
-//    	for (int i = 0; i < colors.length; i++) {
-//    		g.setColor(colors[i]);
-//    		g.fillOval(20, 10+15*i, 15, 15);
-//    		g.drawString(" - " + i, 40, 20+15*i);
-//    		
-//    	}	
     }
     
     public static void addPoint(Point p) 
@@ -194,16 +169,6 @@ public class dbc extends Canvas
     }
     
     public static void countClusters() {
-    	clusters.clear();
-//		for (DataPoint p : points) {
-//			if (p.getCluster() == 0) {
-//				continue;
-//			}
-//			clusters.add(p.getCluster());
-//		}
-//    	lblClusters.setText(Integer.toString(clusters.size()));
-
-    	
     	clusterlist.clear();
 		for (DataPoint p : points) {
 			if (p.getCluster() == 0) {
@@ -259,7 +224,6 @@ public class dbc extends Canvas
     
     public static void clearCanvas() {
     	points.clear();
-    	clusters.clear();
 		lblElements.setText("0");
 		lblClusters.setText("0");
 		listClusters.removeAll();
@@ -278,16 +242,12 @@ public class dbc extends Canvas
 			UIManager.setLookAndFeel(
 			        UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (InstantiationException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IllegalAccessException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (UnsupportedLookAndFeelException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -440,7 +400,6 @@ public class dbc extends Canvas
         	        if (returnVal == JFileChooser.APPROVE_OPTION) {
         	        	File file = fileChooser.getSelectedFile();
         	        	int result = JOptionPane.YES_OPTION;
-//        	        	kontroll.setText(file.getAbsoluteFile() + ".csv");
         	        	if (new File(file.getAbsoluteFile() + ".csv").exists()) {
         	        		result = JOptionPane.NO_OPTION;
         	        		result = JOptionPane.showConfirmDialog(canvas,"The file exists! Overwrite?","Existing file",JOptionPane.YES_NO_CANCEL_OPTION); 
@@ -705,7 +664,6 @@ public class dbc extends Canvas
         	            }
         	            if (file.exists()) {
 	        	        	currentDir = file.getAbsoluteFile();
-	//        	            txtOpenFilename.setText(file.getName());
 		        			clearCanvas();
 		        			BufferedReader in = new BufferedReader(new FileReader(file));
 		        			String line;
