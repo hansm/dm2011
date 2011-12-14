@@ -232,6 +232,7 @@ public class dbc extends Canvas
     	freqtable = "";
     	freqtable1 = "";
     	dcborFreqtable.setText("");
+    	dcborFreqtable1.setText("");
     	switch(c) {
     	case 1:
     		clustering1();
