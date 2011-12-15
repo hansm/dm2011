@@ -457,7 +457,7 @@ public class dbc extends Canvas
         frmDensitybasedClustering.getContentPane().add(lblAuthors);
         
         JLabel lblHeader = new JLabel("");
-        lblHeader.setBounds(48, 0, 250, 140);
+        lblHeader.setBounds(48, 11, 250, 140);
         lblHeader.setIcon(new ImageIcon(dbc.class.getResource("/images/header.gif")));
         frmDensitybasedClustering.getContentPane().add(lblHeader);
         
